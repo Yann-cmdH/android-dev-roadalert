@@ -49,7 +49,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.activity)
-    implementation(libs.androidx.constraintlayout)
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
 
     // ── MVVM — ViewModel + LiveData ───────────────────────
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")

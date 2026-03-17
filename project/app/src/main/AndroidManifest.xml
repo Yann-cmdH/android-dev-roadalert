@@ -2,32 +2,36 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- ══ PERMISSIONS (SAD section 8) ══════════════════════ -->
+    <!-- ══ HARDWARE FEATURES ════════════════════════════════ -->
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.telephony"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.location.gps"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.sensor.accelerometer"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.sensor.gyroscope"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.microphone"
+        android:required="false" />
 
-    <!-- GPS — localisation précise au moment de l'impact -->
+    <!-- ══ PERMISSIONS (SAD section 8) ══════════════════════ -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-
-    <!-- SMS — canal d'alerte primaire (SAD AD-03) -->
     <uses-permission android:name="android.permission.SEND_SMS" />
-
-    <!-- ForegroundService — détection permanente (SAD AD-04) -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
-
-    <!-- Boot — redémarrage automatique du service (SAD section 8) -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-
-    <!-- Microphone — message vocal d'urgence optionnel -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
-
-    <!-- Caméra — photo de la scène optionnelle -->
     <uses-permission android:name="android.permission.CAMERA" />
-
-    <!-- Vibration — feedback pendant le countdown -->
     <uses-permission android:name="android.permission.VIBRATE" />
-
-    <!-- Batterie — exclusion optimisation (SAD NFR) -->
     <uses-permission
         android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
@@ -43,45 +47,36 @@
         android:theme="@style/Theme.RoadAlertCameroun"
         tools:targetApi="31">
 
-        <!-- ── Entry point — sera remplacé par SplashActivity Sprint 1 -->
+        <!-- ── Launcher ───────────────────────────────────── -->
         <activity
-            android:name=".MainActivity"
-            android:exported="true">
+            android:name=".ui.splash.SplashActivity"
+            android:exported="true"
+            android:theme="@style/Theme.RoadAlertCameroun">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <!-- ── UI Activities (SAD section 9) ─────────────── -->
-        <activity
-            android:name=".ui.splash.SplashActivity"
-            android:exported="false" />
-
+        <!-- ── UI Activities ──────────────────────────────── -->
         <activity
             android:name=".ui.onboarding.OnboardingActivity"
             android:exported="false" />
-
         <activity
             android:name=".ui.profile.ProfileSetupActivity"
             android:exported="false" />
-
         <activity
             android:name=".ui.home.HomeActivity"
             android:exported="false" />
-
         <activity
             android:name=".ui.countdown.CountdownActivity"
             android:exported="false" />
-
         <activity
             android:name=".ui.alert.AlertSentActivity"
             android:exported="false" />
-
         <activity
             android:name=".ui.history.HistoryActivity"
             android:exported="false" />
-
         <activity
             android:name=".ui.settings.SettingsActivity"
             android:exported="false" />
@@ -92,13 +87,12 @@
             android:exported="false"
             android:foregroundServiceType="location" />
 
-        <!-- ── BroadcastReceiver — auto-start (SAD section 8) -->
+        <!-- ── BroadcastReceiver (SAD section 8) ──────────── -->
         <receiver
             android:name=".alert.BootCompletedReceiver"
             android:exported="false">
             <intent-filter>
-                <action
-                    android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 
