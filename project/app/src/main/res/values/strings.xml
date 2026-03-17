@@ -32,4 +32,6 @@
     <string name="onboarding_ready_title">Tout est prêt</string>
     <string name="onboarding_ready_msg">Toutes les autorisations sont accordées. Configurons maintenant votre profil médical.</string>
     <string name="onboarding_btn_next">Configurer mon profil</string>
+    <string name="notification_service_title">RoadAlert — Protection active</string>
+    <string name="notification_service_text">Détection d\'accidents en cours</string>
 </resources>

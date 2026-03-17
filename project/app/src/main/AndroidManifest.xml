@@ -37,6 +37,7 @@
 
     <!-- ══ APPLICATION ═══════════════════════════════════════ -->
     <application
+        android:name=".RoadAlertApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -70,6 +71,7 @@
             android:exported="false" />
         <activity
             android:name=".ui.countdown.CountdownActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".ui.alert.AlertSentActivity"
