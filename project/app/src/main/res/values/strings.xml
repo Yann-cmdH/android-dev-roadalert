@@ -1,3 +1,35 @@
 <resources>
     <string name="app_name">RoadAlert Cameroun</string>
+    <string name="splash_app_name">RoadAlert</string>
+    <string name="splash_subtitle">CAMEROUN</string>
+    <string name="splash_logo">RA</string>
+    <string name="onboarding_permission_title">Autorisation requise</string>
+    <string name="onboarding_icon_gps">📍</string>
+    <string name="onboarding_gps_name">Localisation GPS</string>
+    <string name="onboarding_gps_why">Envoie ta position exacte aux secours en cas d\'accident.</string>
+    <string name="onboarding_required">Requis</string>
+    <string name="onboarding_note_required">Sans ceci l\'app ne peut pas fonctionner</string>
+    <string name="onboarding_btn_allow">Autoriser et continuer</string>
+    <string name="home_title">RoadAlert</string>
+    <string name="home_menu">Menu</string>
+    <string name="home_service_active">Protection active</string>
+    <string name="home_service_inactive">Protection inactive</string>
+    <string name="home_service_running">Détection en cours</string>
+    <string name="home_service_stopped">Service arrêté</string>
+    <string name="home_greeting_default">Bonjour</string>
+    <string name="home_sos">SOS</string>
+    <string name="home_sos_sub">Urgence</string>
+    <string name="home_sos_hint">Appuyer en cas d\'accident ou si vous êtes témoin</string>
+    <string name="home_nav_home">Accueil</string>
+    <string name="home_nav_history">Historique</string>
+    <string name="home_nav_settings">Paramètres</string>
+    <string name="dialog_sos_title">Envoyer une alerte ?</string>
+    <string name="dialog_sos_message">Vos contacts d\'urgence vont être alertés avec votre position GPS.</string>
+    <string name="dialog_confirm">Confirmer</string>
+    <string name="dialog_cancel">Annuler</string>
+    <string name="onboarding_sms_name">Envoi de SMS</string>
+    <string name="onboarding_sms_why">Alerte tes proches même sans internet. Fonctionne en zone 2G.</string>
+    <string name="onboarding_ready_title">Tout est prêt</string>
+    <string name="onboarding_ready_msg">Toutes les autorisations sont accordées. Configurons maintenant votre profil médical.</string>
+    <string name="onboarding_btn_next">Configurer mon profil</string>
 </resources>

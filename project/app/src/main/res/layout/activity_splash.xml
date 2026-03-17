@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@color/white">
+
+    <!-- Logo cercle rouge -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/logoCard"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginBottom="16dp"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        app:cardCornerRadius="40dp"
+        app:cardBackgroundColor="@color/red_primary"
+        app:cardElevation="0dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/splash_logo"
+            android:textColor="@color/white"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:gravity="center"/>
+
+    </androidx.cardview.widget.CardView>
+
+    <!-- Nom de l'app -->
+    <TextView
+        android:id="@+id/tvAppName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/splash_app_name"
+        android:textColor="@color/red_primary"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:letterSpacing="0.05"/>
+
+    <!-- Sous-titre -->
+    <TextView
+        android:id="@+id/tvSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/splash_subtitle"
+        android:textColor="@color/text_secondary"
+        android:textSize="11sp"
+        android:letterSpacing="0.15"
+        android:layout_marginTop="4dp"/>
+
+    <!-- Barre de progression -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="72dp"
+        android:layout_height="3dp"
+        android:indeterminate="true"
+        android:indeterminateTint="@color/red_primary"
+        android:layout_marginTop="24dp"/>
+
+</LinearLayout>
