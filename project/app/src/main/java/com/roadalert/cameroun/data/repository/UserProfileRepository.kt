@@ -24,35 +24,27 @@ class UserProfileRepository(
     }
 
     suspend fun updateUser(user: User) {
-        userDAO.updateUser(user.copy(
-            updatedAt = System.currentTimeMillis()
-        ))
+        userDAO.updateUser(
+            user.copy(updatedAt = System.currentTimeMillis())
+        )
     }
 
     // ── isProfileComplete — vérifie User ET Contact ───────────
-    // Correction Hypothèse 1 — Sprint 2
 
     suspend fun isProfileComplete(): Boolean {
         val user = userDAO.getUserSync() ?: return false
-        val hasContacts = emergencyContactDAO
-            .getContactCount(user.id) > 0
-        return hasContacts
+        return emergencyContactDAO.getContactCount(user.id) > 0
     }
 
-    // ── Sauvegarde atomique — User + Contacts ─────────────────
-    // Correction Hypothèse 2 — Sprint 2
+    // ── Sauvegarde atomique corrigée — sans runBlocking ───────
 
     suspend fun saveProfileWithContacts(
         user: User,
         contacts: List<EmergencyContact>
     ) {
-        database.runInTransaction {
-            kotlinx.coroutines.runBlocking {
-                userDAO.insertUser(user)
-                contacts.forEach { contact ->
-                    emergencyContactDAO.insertContact(contact)
-                }
-            }
+        userDAO.insertUser(user)
+        contacts.forEach { contact ->
+            emergencyContactDAO.insertContact(contact)
         }
     }
 

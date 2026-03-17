@@ -1,15 +1,603 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/background">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <!-- Top bar -->
+    <LinearLayout
+        android:id="@+id/topBar"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@color/red_primary"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/profile_title"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/tvStepIndicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/profile_step_1"
+            android:textColor="#BDC3C7"
+            android:textSize="11sp"
+            android:background="@drawable/shape_step_badge"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"/>
+
+    </LinearLayout>
+
+    <!-- Progress bar -->
+    <LinearLayout
+        android:id="@+id/progressLayout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Configuration profil — Sprint 2"
-        android:textSize="16sp"/>
+        android:orientation="vertical"
+        android:background="@color/white"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <View
+                android:id="@+id/progressStep1"
+                android:layout_width="0dp"
+                android:layout_height="4dp"
+                android:layout_weight="1"
+                android:background="@color/red_primary"
+                android:layout_marginEnd="3dp"/>
+
+            <View
+                android:id="@+id/progressStep2"
+                android:layout_width="0dp"
+                android:layout_height="4dp"
+                android:layout_weight="1"
+                android:background="@color/border"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvProgressText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/profile_step_1_label"
+            android:textColor="@color/text_secondary"
+            android:textSize="11sp"
+            android:gravity="center"
+            android:layout_marginTop="4dp"/>
+
+    </LinearLayout>
+
+    <!-- Scrollable content -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:id="@+id/contentContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+            <!-- ── STEP 1 : Profil médical ── -->
+            <LinearLayout
+                android:id="@+id/step1Container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/profile_section_personal"
+                    android:textColor="@color/red_primary"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:paddingBottom="4dp"
+                    android:layout_marginBottom="6dp"/>
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="@color/white">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="10dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/profile_full_name_label"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="2dp"/>
+
+                        <EditText
+                            android:id="@+id/etFullName"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:hint="@string/profile_full_name_hint"
+                            android:textSize="13sp"
+                            android:textColor="@color/text_primary"
+                            android:inputType="textPersonName|textCapWords"
+                            android:maxLength="50"
+                            android:background="@drawable/shape_field_normal"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp"
+                            android:layout_marginBottom="2dp"/>
+
+                        <TextView
+                            android:id="@+id/tvFullNameError"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/profile_field_required"
+                            android:textColor="#E74C3C"
+                            android:textSize="10sp"
+                            android:visibility="gone"
+                            android:layout_marginBottom="8dp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/profile_phone_label"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="2dp"/>
+
+                        <EditText
+                            android:id="@+id/etPhoneNumber"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:hint="@string/profile_phone_hint"
+                            android:textSize="13sp"
+                            android:textColor="@color/text_primary"
+                            android:inputType="number"
+                            android:maxLength="9"
+                            android:background="@drawable/shape_field_normal"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp"
+                            android:layout_marginBottom="2dp"/>
+
+                        <TextView
+                            android:id="@+id/tvPhoneError"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/profile_field_required"
+                            android:textColor="#E74C3C"
+                            android:textSize="10sp"
+                            android:visibility="gone"/>
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/profile_section_medical"
+                    android:textColor="@color/red_primary"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:paddingBottom="4dp"
+                    android:layout_marginBottom="6dp"/>
+
+                <!-- Note médicale — barre bleue gauche -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="match_parent"
+                        android:background="#2E86C1"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/shape_info_note"
+                        android:padding="8dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/profile_medical_note"
+                            android:textColor="#1A5276"
+                            android:textSize="11sp"
+                            android:lineSpacingExtra="2dp"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="@color/white">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="10dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/profile_blood_type_label"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="2dp"/>
+
+                        <EditText
+                            android:id="@+id/etBloodType"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:hint="@string/profile_blood_type_hint"
+                            android:textSize="13sp"
+                            android:textColor="@color/text_primary"
+                            android:inputType="text"
+                            android:maxLength="5"
+                            android:background="@drawable/shape_field_normal"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp"
+                            android:layout_marginBottom="8dp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/profile_allergies_label"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="2dp"/>
+
+                        <EditText
+                            android:id="@+id/etAllergies"
+                            android:layout_width="match_parent"
+                            android:layout_height="72dp"
+                            android:hint="@string/profile_allergies_hint"
+                            android:textSize="13sp"
+                            android:textColor="@color/text_primary"
+                            android:inputType="textMultiLine"
+                            android:maxLength="200"
+                            android:gravity="top|start"
+                            android:background="@drawable/shape_field_normal"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp"
+                            android:paddingTop="8dp"
+                            android:layout_marginBottom="8dp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/profile_conditions_label"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="2dp"/>
+
+                        <EditText
+                            android:id="@+id/etMedicalConditions"
+                            android:layout_width="match_parent"
+                            android:layout_height="72dp"
+                            android:hint="@string/profile_conditions_hint"
+                            android:textSize="13sp"
+                            android:textColor="@color/text_primary"
+                            android:inputType="textMultiLine"
+                            android:maxLength="200"
+                            android:gravity="top|start"
+                            android:background="@drawable/shape_field_normal"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp"
+                            android:paddingTop="8dp"/>
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+            </LinearLayout>
+
+            <!-- ── STEP 2 : Contacts d'urgence ── -->
+            <LinearLayout
+                android:id="@+id/step2Container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <!-- Note contacts — barre orange gauche -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="10dp">
+
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="match_parent"
+                        android:background="#F39C12"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/shape_warn_note"
+                        android:padding="8dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/profile_contacts_note"
+                            android:textColor="#7D6608"
+                            android:textSize="11sp"
+                            android:lineSpacingExtra="2dp"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- Contact 1 obligatoire -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/profile_contact_1_title"
+                    android:textColor="@color/red_primary"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:paddingBottom="4dp"
+                    android:layout_marginBottom="6dp"/>
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="@color/white">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="10dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/profile_contact_name_label"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="2dp"/>
+
+                        <EditText
+                            android:id="@+id/etContact1Name"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:hint="@string/profile_contact_name_hint"
+                            android:textSize="13sp"
+                            android:textColor="@color/text_primary"
+                            android:inputType="textPersonName|textCapWords"
+                            android:maxLength="50"
+                            android:background="@drawable/shape_field_normal"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp"
+                            android:layout_marginBottom="2dp"/>
+
+                        <TextView
+                            android:id="@+id/tvContact1NameError"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/profile_field_required"
+                            android:textColor="#E74C3C"
+                            android:textSize="10sp"
+                            android:visibility="gone"
+                            android:layout_marginBottom="8dp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/profile_contact_phone_label"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="2dp"/>
+
+                        <EditText
+                            android:id="@+id/etContact1Phone"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:hint="@string/profile_contact_phone_hint"
+                            android:textSize="13sp"
+                            android:textColor="@color/text_primary"
+                            android:inputType="number"
+                            android:maxLength="9"
+                            android:background="@drawable/shape_field_normal"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp"
+                            android:layout_marginBottom="2dp"/>
+
+                        <TextView
+                            android:id="@+id/tvContact1PhoneError"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/profile_contact_phone_required"
+                            android:textColor="#E74C3C"
+                            android:textSize="10sp"
+                            android:visibility="gone"
+                            android:layout_marginBottom="8dp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/profile_contact_relation_label"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="2dp"/>
+
+                        <EditText
+                            android:id="@+id/etContact1Relation"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:hint="@string/profile_contact_relation_hint"
+                            android:textSize="13sp"
+                            android:textColor="@color/text_primary"
+                            android:inputType="text"
+                            android:maxLength="30"
+                            android:background="@drawable/shape_field_normal"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp"/>
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+                <!-- Contact 2 optionnel -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/profile_contact_2_title"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:paddingBottom="4dp"
+                    android:layout_marginBottom="6dp"/>
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="@color/white">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="10dp">
+
+                        <EditText
+                            android:id="@+id/etContact2Name"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:hint="@string/profile_contact_name_hint"
+                            android:textSize="13sp"
+                            android:textColor="@color/text_primary"
+                            android:inputType="textPersonName|textCapWords"
+                            android:maxLength="50"
+                            android:background="@drawable/shape_field_normal"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp"
+                            android:layout_marginBottom="8dp"/>
+
+                        <EditText
+                            android:id="@+id/etContact2Phone"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:hint="@string/profile_contact_phone_hint"
+                            android:textSize="13sp"
+                            android:textColor="@color/text_primary"
+                            android:inputType="number"
+                            android:maxLength="9"
+                            android:background="@drawable/shape_field_normal"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp"
+                            android:layout_marginBottom="8dp"/>
+
+                        <EditText
+                            android:id="@+id/etContact2Relation"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:hint="@string/profile_contact_relation_hint"
+                            android:textSize="13sp"
+                            android:textColor="@color/text_primary"
+                            android:inputType="text"
+                            android:maxLength="30"
+                            android:background="@drawable/shape_field_normal"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp"/>
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <!-- Action button — toujours visible en bas -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:elevation="4dp"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <Button
+            android:id="@+id/btnAction"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="@string/profile_btn_next"
+            android:textColor="@color/white"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:backgroundTint="@color/red_primary"
+            android:stateListAnimator="@null"
+            android:enabled="false"/>
+
+        <TextView
+            android:id="@+id/tvMissingFields"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/profile_missing_fields"
+            android:textColor="#E74C3C"
+            android:textSize="11sp"
+            android:gravity="center"
+            android:layout_marginTop="4dp"/>
+
+    </LinearLayout>
 
 </LinearLayout>
