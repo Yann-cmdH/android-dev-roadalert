@@ -5,8 +5,6 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.roadalert.cameroun.data.db.AppDatabase
-import com.roadalert.cameroun.data.repository.UserProfileRepository
 import com.roadalert.cameroun.databinding.ActivitySplashBinding
 import com.roadalert.cameroun.ui.home.HomeActivity
 import com.roadalert.cameroun.ui.onboarding.OnboardingActivity
@@ -17,12 +15,7 @@ class SplashActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySplashBinding
 
     private val viewModel: SplashViewModel by viewModels {
-        SplashViewModelFactory(
-            UserProfileRepository(
-                AppDatabase.getInstance(this).userDAO(),
-                AppDatabase.getInstance(this).emergencyContactDAO()
-            )
-        )
+        SplashViewModelFactory(applicationContext)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

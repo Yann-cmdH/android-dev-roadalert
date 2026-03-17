@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    id("com.google.devtools.ksp") version "1.9.0-1.0.13"
+    id("com.google.devtools.ksp") version "1.9.24-1.0.20"
 }
 
 android {
@@ -39,6 +39,7 @@ android {
 
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 }
 
@@ -73,6 +74,9 @@ dependencies {
 
     // ── Coroutines ────────────────────────────────────────
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+
+    // ── RecyclerView — Sprint 2 ───────────────────────────
+    implementation("androidx.recyclerview:recyclerview:1.3.2")
 
     // ── Tests ─────────────────────────────────────────────
     testImplementation(libs.junit)

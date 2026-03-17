@@ -1,5 +1,6 @@
 package com.roadalert.cameroun.data.repository
 
+import com.roadalert.cameroun.data.db.AppDatabase
 import com.roadalert.cameroun.data.db.dao.EmergencyContactDAO
 import com.roadalert.cameroun.data.db.dao.UserDAO
 import com.roadalert.cameroun.data.db.entity.EmergencyContact
@@ -22,11 +23,28 @@ class UserProfileRepository(
     }
 
     suspend fun updateUser(user: User) {
-        userDAO.updateUser(user)
+        userDAO.updateUser(
+            user.copy(updatedAt = System.currentTimeMillis())
+        )
     }
 
+    // ── isProfileComplete — vérifie User ET Contact ───────────
+
     suspend fun isProfileComplete(): Boolean {
-        return userDAO.getUserCount() > 0
+        val user = userDAO.getUserSync() ?: return false
+        return emergencyContactDAO.getContactCount(user.id) > 0
+    }
+
+    // ── Sauvegarde atomique ───────────────────────────────────
+
+    suspend fun saveProfileWithContacts(
+        user: User,
+        contacts: List<EmergencyContact>
+    ) {
+        userDAO.insertUser(user)
+        contacts.forEach { contact ->
+            emergencyContactDAO.insertContact(contact)
+        }
     }
 
     // ── Emergency contacts operations ────────────────────────
