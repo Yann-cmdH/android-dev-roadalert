@@ -17,12 +17,7 @@ class SplashActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySplashBinding
 
     private val viewModel: SplashViewModel by viewModels {
-        SplashViewModelFactory(
-            UserProfileRepository(
-                AppDatabase.getInstance(this).userDAO(),
-                AppDatabase.getInstance(this).emergencyContactDAO()
-            )
-        )
+        SplashViewModelFactory(applicationContext)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

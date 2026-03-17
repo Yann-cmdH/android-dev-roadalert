@@ -24,6 +24,9 @@ interface UserDAO {
     @Query("SELECT * FROM user LIMIT 1")
     fun getUser(): Flow<User?>
 
+    @Query("SELECT * FROM user LIMIT 1")
+    suspend fun getUserSync(): User?
+
     @Query("SELECT COUNT(*) FROM user")
     suspend fun getUserCount(): Int
 }

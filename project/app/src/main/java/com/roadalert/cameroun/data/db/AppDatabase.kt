@@ -10,6 +10,7 @@ import com.roadalert.cameroun.data.db.dao.UserDAO
 import com.roadalert.cameroun.data.db.entity.AccidentEvent
 import com.roadalert.cameroun.data.db.entity.EmergencyContact
 import com.roadalert.cameroun.data.db.entity.User
+import com.roadalert.cameroun.data.repository.UserProfileRepository
 
 @Database(
     entities = [
@@ -40,6 +41,15 @@ abstract class AppDatabase : RoomDatabase() {
                 INSTANCE = instance
                 instance
             }
+        }
+
+        fun buildRepository(context: Context): UserProfileRepository {
+            val db = getInstance(context)
+            return UserProfileRepository(
+                db.userDAO(),
+                db.emergencyContactDAO(),
+                db
+            )
         }
     }
 }

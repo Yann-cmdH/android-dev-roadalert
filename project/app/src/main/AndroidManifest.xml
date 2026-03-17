@@ -64,6 +64,7 @@
             android:exported="false" />
         <activity
             android:name=".ui.profile.ProfileSetupActivity"
+            android:windowSoftInputMode="adjustResize"
             android:exported="false" />
         <activity
             android:name=".ui.home.HomeActivity"

@@ -1,5 +1,6 @@
 package com.roadalert.cameroun.data.repository
 
+import com.roadalert.cameroun.data.db.AppDatabase
 import com.roadalert.cameroun.data.db.dao.EmergencyContactDAO
 import com.roadalert.cameroun.data.db.dao.UserDAO
 import com.roadalert.cameroun.data.db.entity.EmergencyContact
@@ -8,7 +9,8 @@ import kotlinx.coroutines.flow.Flow
 
 class UserProfileRepository(
     private val userDAO: UserDAO,
-    private val emergencyContactDAO: EmergencyContactDAO
+    private val emergencyContactDAO: EmergencyContactDAO,
+    private val database: AppDatabase
 ) {
 
     // ── User operations ──────────────────────────────────────
@@ -22,11 +24,36 @@ class UserProfileRepository(
     }
 
     suspend fun updateUser(user: User) {
-        userDAO.updateUser(user)
+        userDAO.updateUser(user.copy(
+            updatedAt = System.currentTimeMillis()
+        ))
     }
 
+    // ── isProfileComplete — vérifie User ET Contact ───────────
+    // Correction Hypothèse 1 — Sprint 2
+
     suspend fun isProfileComplete(): Boolean {
-        return userDAO.getUserCount() > 0
+        val user = userDAO.getUserSync() ?: return false
+        val hasContacts = emergencyContactDAO
+            .getContactCount(user.id) > 0
+        return hasContacts
+    }
+
+    // ── Sauvegarde atomique — User + Contacts ─────────────────
+    // Correction Hypothèse 2 — Sprint 2
+
+    suspend fun saveProfileWithContacts(
+        user: User,
+        contacts: List<EmergencyContact>
+    ) {
+        database.runInTransaction {
+            kotlinx.coroutines.runBlocking {
+                userDAO.insertUser(user)
+                contacts.forEach { contact ->
+                    emergencyContactDAO.insertContact(contact)
+                }
+            }
+        }
     }
 
     // ── Emergency contacts operations ────────────────────────

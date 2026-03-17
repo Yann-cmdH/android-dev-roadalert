@@ -19,12 +19,7 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var binding: ActivityHomeBinding
 
     private val viewModel: HomeViewModel by viewModels {
-        HomeViewModelFactory(
-            UserProfileRepository(
-                AppDatabase.getInstance(this).userDAO(),
-                AppDatabase.getInstance(this).emergencyContactDAO()
-            )
-        )
+        HomeViewModelFactory(applicationContext)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
