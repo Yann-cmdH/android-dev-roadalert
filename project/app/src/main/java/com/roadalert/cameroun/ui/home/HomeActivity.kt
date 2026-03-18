@@ -16,9 +16,9 @@ import com.roadalert.cameroun.BuildConfig
 import com.roadalert.cameroun.R
 import com.roadalert.cameroun.databinding.ActivityHomeBinding
 import com.roadalert.cameroun.detection.AccidentDetectionService
+import com.roadalert.cameroun.ui.countdown.CountdownActivity
 import com.roadalert.cameroun.ui.history.HistoryActivity
 import com.roadalert.cameroun.ui.settings.SettingsActivity
-import com.roadalert.cameroun.ui.countdown.CountdownActivity
 import com.roadalert.cameroun.util.ServiceActions
 import kotlinx.coroutines.launch
 
@@ -34,8 +34,7 @@ class HomeActivity : AppCompatActivity() {
 
     private val serviceStateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            if (intent.action ==
-                ServiceActions.ACTION_SERVICE_STATE_CHANGED) {
+            if (intent.action == ServiceActions.ACTION_SERVICE_STATE_CHANGED) {
                 val isRunning = intent.getBooleanExtra(
                     ServiceActions.EXTRA_SERVICE_RUNNING, false
                 )
@@ -46,8 +45,7 @@ class HomeActivity : AppCompatActivity() {
 
     private val accidentDetectedReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            if (intent.action ==
-                ServiceActions.ACTION_ACCIDENT_DETECTED) {
+            if (intent.action == ServiceActions.ACTION_ACCIDENT_DETECTED) {
                 navigateToCountdown()
             }
         }
@@ -92,13 +90,11 @@ class HomeActivity : AppCompatActivity() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             registerReceiver(
-                serviceStateReceiver,
-                serviceFilter,
+                serviceStateReceiver, serviceFilter,
                 RECEIVER_NOT_EXPORTED
             )
             registerReceiver(
-                accidentDetectedReceiver,
-                accidentFilter,
+                accidentDetectedReceiver, accidentFilter,
                 RECEIVER_NOT_EXPORTED
             )
         } else {
@@ -112,7 +108,7 @@ class HomeActivity : AppCompatActivity() {
             unregisterReceiver(serviceStateReceiver)
             unregisterReceiver(accidentDetectedReceiver)
         } catch (e: IllegalArgumentException) {
-            // Receiver pas encore enregistré — ignoré
+            // Ignoré
         }
     }
 
@@ -121,8 +117,7 @@ class HomeActivity : AppCompatActivity() {
     private fun checkAndStartService() {
         if (!isServiceRunning()) {
             val serviceIntent = Intent(
-                this,
-                AccidentDetectionService::class.java
+                this, AccidentDetectionService::class.java
             ).apply {
                 action = ServiceActions.ACTION_START_SERVICE
             }
@@ -142,8 +137,10 @@ class HomeActivity : AppCompatActivity() {
             Context.ACTIVITY_SERVICE
         ) as ActivityManager
         return manager.getRunningServices(Int.MAX_VALUE)
-            .any { it.service.className ==
-                    AccidentDetectionService::class.java.name }
+            .any {
+                it.service.className ==
+                        AccidentDetectionService::class.java.name
+            }
     }
 
     // ── Observe ViewModel ─────────────────────────────────────
@@ -152,9 +149,9 @@ class HomeActivity : AppCompatActivity() {
         lifecycleScope.launch {
             viewModel.user.collect { user ->
                 user?.let {
-                    binding.tvGreeting.text = getString(
-                        R.string.home_greeting_default
-                    ) + ", ${it.getDisplayName()}"
+                    binding.tvGreeting.text =
+                        getString(R.string.home_greeting_default) +
+                                ", ${it.fullName}"
                 }
             }
         }
@@ -186,7 +183,7 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-    // ── Debug button — visible seulement en DEBUG ─────────────
+    // ── Debug button ──────────────────────────────────────────
 
     private fun setupDebugButton() {
         binding.btnDebugTest.visibility = View.VISIBLE
@@ -209,12 +206,8 @@ class HomeActivity : AppCompatActivity() {
             binding.cardService.setCardBackgroundColor(
                 getColor(R.color.green_surface)
             )
-            binding.tvServiceStatus.setText(
-                R.string.home_service_active
-            )
-            binding.tvServiceSub.setText(
-                R.string.home_service_running
-            )
+            binding.tvServiceStatus.setText(R.string.home_service_active)
+            binding.tvServiceSub.setText(R.string.home_service_running)
             binding.viewPulse.setBackgroundResource(
                 R.drawable.shape_circle_green
             )
@@ -222,12 +215,8 @@ class HomeActivity : AppCompatActivity() {
             binding.cardService.setCardBackgroundColor(
                 getColor(R.color.red_surface)
             )
-            binding.tvServiceStatus.setText(
-                R.string.home_service_inactive
-            )
-            binding.tvServiceSub.setText(
-                R.string.home_service_stopped
-            )
+            binding.tvServiceStatus.setText(R.string.home_service_inactive)
+            binding.tvServiceSub.setText(R.string.home_service_stopped)
             binding.viewPulse.setBackgroundResource(
                 R.drawable.shape_circle_red
             )
@@ -250,12 +239,11 @@ class HomeActivity : AppCompatActivity() {
             .show()
     }
 
-    // ── Navigation vers CountdownActivity ────────────────────
+    // ── Navigation ────────────────────────────────────────────
 
     private fun navigateToCountdown() {
         val intent = Intent(
-            this,
-            CountdownActivity::class.java
+            this, CountdownActivity::class.java
         ).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or
                     Intent.FLAG_ACTIVITY_CLEAR_TOP

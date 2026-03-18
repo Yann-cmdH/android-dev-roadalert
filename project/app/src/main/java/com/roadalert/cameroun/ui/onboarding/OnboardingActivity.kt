@@ -7,11 +7,13 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import com.roadalert.cameroun.R
 import com.roadalert.cameroun.databinding.ActivityOnboardingBinding
 import com.roadalert.cameroun.ui.profile.ProfileSetupActivity
 import kotlinx.coroutines.launch
@@ -70,8 +72,8 @@ class OnboardingActivity : AppCompatActivity() {
     }
 
     private fun updateStepIndicator(step: Int) {
-        val activeColor = getColor(com.roadalert.cameroun.R.color.red_primary)
-        val inactiveColor = getColor(com.roadalert.cameroun.R.color.border)
+        val activeColor = getColor(R.color.red_primary)
+        val inactiveColor = getColor(R.color.border)
         binding.step1.setBackgroundColor(if (step >= 1) activeColor else inactiveColor)
         binding.step2.setBackgroundColor(if (step >= 2) activeColor else inactiveColor)
         binding.step3.setBackgroundColor(if (step >= 3) activeColor else inactiveColor)
@@ -80,22 +82,22 @@ class OnboardingActivity : AppCompatActivity() {
     private fun updateContent(step: Int) {
         when (step) {
             1 -> {
-                binding.tvPermName.setText(com.roadalert.cameroun.R.string.onboarding_gps_name)
-                binding.tvPermWhy.setText(com.roadalert.cameroun.R.string.onboarding_gps_why)
+                binding.tvPermName.setText(R.string.onboarding_gps_name)
+                binding.tvPermWhy.setText(R.string.onboarding_gps_why)
                 binding.tvPermIcon.text = "📍"
-                binding.btnAction.setText(com.roadalert.cameroun.R.string.onboarding_btn_allow)
+                binding.btnAction.setText(R.string.onboarding_btn_allow)
             }
             2 -> {
-                binding.tvPermName.setText(com.roadalert.cameroun.R.string.onboarding_sms_name)
-                binding.tvPermWhy.setText(com.roadalert.cameroun.R.string.onboarding_sms_why)
+                binding.tvPermName.setText(R.string.onboarding_sms_name)
+                binding.tvPermWhy.setText(R.string.onboarding_sms_why)
                 binding.tvPermIcon.text = "✉"
-                binding.btnAction.setText(com.roadalert.cameroun.R.string.onboarding_btn_allow)
+                binding.btnAction.setText(R.string.onboarding_btn_allow)
             }
             3 -> {
-                binding.tvPermName.setText(com.roadalert.cameroun.R.string.onboarding_ready_title)
-                binding.tvPermWhy.setText(com.roadalert.cameroun.R.string.onboarding_ready_msg)
+                binding.tvPermName.setText(R.string.onboarding_ready_title)
+                binding.tvPermWhy.setText(R.string.onboarding_ready_msg)
                 binding.tvPermIcon.text = "✓"
-                binding.btnAction.setText(com.roadalert.cameroun.R.string.onboarding_btn_next)
+                binding.btnAction.setText(R.string.onboarding_btn_next)
             }
         }
     }
@@ -120,10 +122,10 @@ class OnboardingActivity : AppCompatActivity() {
     }
 
     private fun showPermissionDenied() {
-        android.widget.Toast.makeText(
+        Toast.makeText(
             this,
             "Cette permission est nécessaire pour le fonctionnement de l'app",
-            android.widget.Toast.LENGTH_LONG
+            Toast.LENGTH_LONG
         ).show()
     }
 
