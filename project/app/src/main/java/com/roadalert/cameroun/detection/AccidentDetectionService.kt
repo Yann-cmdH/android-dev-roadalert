@@ -1,6 +1,5 @@
 package com.roadalert.cameroun.detection
 
-import android.app.Notification
 import android.app.PendingIntent
 import android.app.Service
 import android.content.BroadcastReceiver
@@ -11,6 +10,7 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.roadalert.cameroun.R
@@ -28,12 +28,15 @@ class AccidentDetectionService : Service(),
     private var gyroscope: Sensor? = null
     private var linearAcceleration: Sensor? = null
 
-    // ── Moteur de détection ───────────────────────────────────
+    // ── Composants détection ──────────────────────────────────
     private lateinit var fusionEngine: SensorFusionEngine
     private lateinit var countdownManager: CountdownManager
     private lateinit var capabilityDetector: SensorCapabilityDetector
 
-    // ── Receiver pour annulation countdown ───────────────────
+    // ── État interne ──────────────────────────────────────────
+    private var isMonitoring = false
+
+    // ── Receiver annulation countdown ─────────────────────────
     private val cancelReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action == ServiceActions.ACTION_CANCEL_COUNTDOWN) {
@@ -41,6 +44,7 @@ class AccidentDetectionService : Service(),
             }
         }
     }
+    private var isCancelReceiverRegistered = false
 
     // ── Lifecycle ─────────────────────────────────────────────
 
@@ -65,6 +69,7 @@ class AccidentDetectionService : Service(),
     ): Int {
         when (intent?.action) {
             ServiceActions.ACTION_STOP_SERVICE -> {
+                stopForeground(STOP_FOREGROUND_REMOVE)
                 stopSelf()
                 return START_NOT_STICKY
             }
@@ -73,6 +78,7 @@ class AccidentDetectionService : Service(),
         startForegroundWithNotification()
         registerSensors()
         fusionEngine.startMonitoring()
+        isMonitoring = true
         broadcastServiceState(true)
 
         return START_STICKY
@@ -82,8 +88,9 @@ class AccidentDetectionService : Service(),
         unregisterSensors()
         countdownManager.release()
         fusionEngine.stopMonitoring()
+        isMonitoring = false
         broadcastServiceState(false)
-        unregisterReceiver(cancelReceiver)
+        unregisterCancelReceiver()
         super.onDestroy()
     }
 
@@ -92,7 +99,9 @@ class AccidentDetectionService : Service(),
     // ── Notification persistante ──────────────────────────────
 
     private fun startForegroundWithNotification() {
-        val homeIntent = Intent(this, HomeActivity::class.java).apply {
+        val homeIntent = Intent(
+            this, HomeActivity::class.java
+        ).apply {
             flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
         }
 
@@ -117,6 +126,7 @@ class AccidentDetectionService : Service(),
             .setSmallIcon(R.drawable.ic_notification)
             .setContentIntent(pendingIntent)
             .setOngoing(true)
+            .setSilent(true)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .build()
 
@@ -131,7 +141,7 @@ class AccidentDetectionService : Service(),
     private fun registerSensors() {
         val mode = capabilityDetector.detectMode()
 
-        // Accéléromètre — Condition 1 — TOUJOURS
+        // Accéléromètre — Condition 1 — TOUJOURS requis
         accelerometer = sensorManager.getDefaultSensor(
             Sensor.TYPE_ACCELEROMETER
         )
@@ -168,26 +178,39 @@ class AccidentDetectionService : Service(),
     }
 
     private fun unregisterSensors() {
-        sensorManager.unregisterListener(this)
+        try {
+            sensorManager.unregisterListener(this)
+        } catch (e: Exception) {
+            // Ignoré — capteurs déjà désenregistrés
+        }
     }
 
     // ── SensorEventListener ───────────────────────────────────
 
     override fun onSensorChanged(event: SensorEvent) {
-        fusionEngine.onSensorData(event.sensor.type, event.values)
+        if (!isMonitoring) return
+        fusionEngine.onSensorData(
+            event.sensor.type,
+            event.values
+        )
     }
 
-    override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {
+    override fun onAccuracyChanged(
+        sensor: Sensor,
+        accuracy: Int
+    ) {
         // Non utilisé
     }
 
     // ── AccidentListener ──────────────────────────────────────
 
     override fun onAccidentDetected(confidence: Float) {
+        // Démarrer le countdown
         countdownManager.start {
             onCountdownFinished()
         }
 
+        // Notifier l'UI — ouvrir CountdownActivity
         val intent = Intent(
             ServiceActions.ACTION_ACCIDENT_DETECTED
         ).apply {
@@ -195,36 +218,50 @@ class AccidentDetectionService : Service(),
                 ServiceActions.EXTRA_CONFIDENCE,
                 confidence
             )
+            // Package explicite pour sécurité Android 13+
+            setPackage(packageName)
         }
         sendBroadcast(intent)
     }
 
     override fun onConditionProgress(step: Int) {
-        // Log progression pour debug
+        // Log progression pour debug — non utilisé en production
     }
 
     // ── Countdown terminé — accident confirmé ─────────────────
 
     private fun onCountdownFinished() {
+        // Arrêter la détection pendant le traitement
         fusionEngine.stopMonitoring()
+        isMonitoring = false
         unregisterSensors()
 
+        // Notifier Sprint 4 — AlertManager
         val intent = Intent(
             ServiceActions.ACTION_ACCIDENT_CONFIRMED
-        )
+        ).apply {
+            setPackage(packageName)
+        }
         sendBroadcast(intent)
     }
 
     // ── Annulation countdown ──────────────────────────────────
 
     private fun handleCancellation() {
+        // Annuler le countdown
         countdownManager.cancel()
+
+        // Réinitialiser le moteur de détection
         fusionEngine.reset()
         fusionEngine.startMonitoring()
+        isMonitoring = true
 
+        // Notifier l'UI
         val intent = Intent(
             ServiceActions.ACTION_ACCIDENT_CANCELLED
-        )
+        ).apply {
+            setPackage(packageName)
+        }
         sendBroadcast(intent)
     }
 
@@ -238,16 +275,40 @@ class AccidentDetectionService : Service(),
                 ServiceActions.EXTRA_SERVICE_RUNNING,
                 isRunning
             )
+            setPackage(packageName)
         }
         sendBroadcast(intent)
     }
 
-    // ── Register cancel receiver ──────────────────────────────
+    // ── Register cancel receiver — Android 13+ safe ───────────
 
     private fun registerCancelReceiver() {
+        if (isCancelReceiverRegistered) return
+
         val filter = IntentFilter(
             ServiceActions.ACTION_CANCEL_COUNTDOWN
         )
-        registerReceiver(cancelReceiver, filter)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(
+                cancelReceiver,
+                filter,
+                RECEIVER_NOT_EXPORTED
+            )
+        } else {
+            registerReceiver(cancelReceiver, filter)
+        }
+
+        isCancelReceiverRegistered = true
+    }
+
+    private fun unregisterCancelReceiver() {
+        if (!isCancelReceiverRegistered) return
+        try {
+            unregisterReceiver(cancelReceiver)
+            isCancelReceiverRegistered = false
+        } catch (e: IllegalArgumentException) {
+            // Ignoré — receiver déjà désenregistré
+        }
     }
 }

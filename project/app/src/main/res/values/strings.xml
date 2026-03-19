@@ -82,4 +82,11 @@
     <string name="profile_blood_nsp">Je ne connais pas mon groupe sanguin</string>
     <string name="profile_add_contact_3">+ Ajouter un 3ème contact</string>
     <string name="profile_contact_3_title">3ème contact — Optionnel</string>
+    <string name="onboarding_permission_denied">Cette permission est nécessaire pour le fonctionnement de l\'app</string>
+    <string name="home_gps_disabled_title">GPS désactivé</string>
+    <string name="home_gps_disabled_sub">Position non incluse dans les alertes</string>
+    <string name="home_sms_disabled_title">SMS désactivé</string>
+    <string name="home_sms_disabled_sub">App non fonctionnelle — alertes impossibles</string>
+    <string name="home_btn_activate">Activer</string>
+    <string name="home_debug_test">TEST — Simuler accident</string>
 </resources>

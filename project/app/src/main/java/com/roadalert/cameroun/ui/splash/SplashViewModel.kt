@@ -11,12 +11,22 @@ class SplashViewModel(
     private val repository: UserProfileRepository
 ) : ViewModel() {
 
-    private val _isProfileComplete = MutableStateFlow<Boolean?>(null)
-    val isProfileComplete: StateFlow<Boolean?> = _isProfileComplete
+    private val _isProfileComplete =
+        MutableStateFlow<Boolean?>(null)
+    val isProfileComplete: StateFlow<Boolean?> =
+        _isProfileComplete
 
     fun checkProfile() {
         viewModelScope.launch {
-            _isProfileComplete.value = repository.isProfileComplete()
+            try {
+                _isProfileComplete.value =
+                    repository.isProfileComplete()
+            } catch (e: Exception) {
+                // DB corrompue ou inaccessible
+                // → traiter comme profil incomplet
+                // → navigation vers Onboarding
+                _isProfileComplete.value = false
+            }
         }
     }
 }
