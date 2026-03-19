@@ -79,4 +79,7 @@
     <string name="profile_phone_invalid">Numéro invalide — 9 chiffres commençant par 6</string>
     <string name="profile_name_invalid">Le nom ne peut pas contenir de chiffres</string>
     <string name="profile_contact_partial_error">Contact 2 incomplet — remplissez nom et téléphone ou laissez les deux vides</string>
+    <string name="profile_blood_nsp">Je ne connais pas mon groupe sanguin</string>
+    <string name="profile_add_contact_3">+ Ajouter un 3ème contact</string>
+    <string name="profile_contact_3_title">3ème contact — Optionnel</string>
 </resources>

@@ -1,6 +1,7 @@
 package com.roadalert.cameroun.ui.profile
 
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -23,15 +24,32 @@ class ProfileSetupActivity : AppCompatActivity() {
         ProfileViewModelFactory(applicationContext)
     }
 
+    // ── Boutons groupe sanguin ────────────────────────────────
+    private val bloodTypeButtons by lazy {
+        mapOf(
+            "A+"  to binding.btnBloodAPos,
+            "A-"  to binding.btnBloodANeg,
+            "B+"  to binding.btnBloodBPos,
+            "B-"  to binding.btnBloodBNeg,
+            "O+"  to binding.btnBloodOPos,
+            "O-"  to binding.btnBloodONeg,
+            "AB+" to binding.btnBloodABPos,
+            "AB-" to binding.btnBloodABNeg,
+            "NSP" to binding.btnBloodNSP
+        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityProfileSetupBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         setupBackNavigation()
-        observeViewModel()
+        setupBloodTypeButtons()
+        setupContact3Button()
         setupTextWatchers()
         setupClickListeners()
+        observeViewModel()
         updateButtonState()
     }
 
@@ -53,9 +71,53 @@ class ProfileSetupActivity : AppCompatActivity() {
         )
     }
 
+    // ── Groupe sanguin — grille boutons ───────────────────────
+
+    private fun setupBloodTypeButtons() {
+        bloodTypeButtons.forEach { (type, button) ->
+            button.setOnClickListener {
+                // Si déjà sélectionné → désélectionner
+                if (viewModel.isBloodTypeSelected(type)) {
+                    viewModel.selectBloodType(null)
+                } else {
+                    viewModel.selectBloodType(type)
+                }
+                updateBloodTypeUI()
+            }
+        }
+    }
+
+    private fun updateBloodTypeUI() {
+        val selectedType = viewModel.selectedBloodType.value
+        bloodTypeButtons.forEach { (type, button) ->
+            if (type == selectedType) {
+                // Sélectionné → fond rouge
+                button.backgroundTintList =
+                    ColorStateList.valueOf(getColor(R.color.red_primary))
+                button.setTextColor(getColor(R.color.white))
+            } else {
+                // Non sélectionné → fond gris
+                button.backgroundTintList =
+                    ColorStateList.valueOf(getColor(R.color.border))
+                button.setTextColor(getColor(R.color.text_primary))
+            }
+        }
+    }
+
+    // ── Contact 3 — bouton ajouter ────────────────────────────
+
+    private fun setupContact3Button() {
+        binding.btnAddContact3.setOnClickListener {
+            viewModel.showContact3()
+            binding.contact3Container.visibility = View.VISIBLE
+            binding.btnAddContact3.visibility = View.GONE
+        }
+    }
+
     // ── Observe ViewModel ─────────────────────────────────────
 
     private fun observeViewModel() {
+
         lifecycleScope.launch {
             viewModel.currentStep.collect { step ->
                 when (step) {
@@ -71,9 +133,12 @@ class ProfileSetupActivity : AppCompatActivity() {
                     if (viewModel.currentStep.value == 1) {
                         binding.etFullName.setText(it.fullName)
                         binding.etPhoneNumber.setText(it.phoneNumber)
-                        binding.etBloodType.setText(it.bloodType)
                         binding.etAllergies.setText(it.allergies)
-                        binding.etMedicalConditions.setText(it.medicalConditions)
+                        binding.etMedicalConditions
+                            .setText(it.medicalConditions)
+                        // Restaurer groupe sanguin
+                        viewModel.selectBloodType(it.bloodType)
+                        updateBloodTypeUI()
                     }
                 }
             }
@@ -108,7 +173,9 @@ class ProfileSetupActivity : AppCompatActivity() {
             viewModel.errorMessage.collect { error ->
                 error?.let {
                     Snackbar.make(
-                        binding.root, it, Snackbar.LENGTH_LONG
+                        binding.root,
+                        it,
+                        Snackbar.LENGTH_LONG
                     ).show()
                 }
             }
@@ -120,10 +187,16 @@ class ProfileSetupActivity : AppCompatActivity() {
     private fun showStep1() {
         binding.step1Container.visibility = View.VISIBLE
         binding.step2Container.visibility = View.GONE
-        binding.tvStepIndicator.text = getString(R.string.profile_step_1)
-        binding.tvProgressText.text = getString(R.string.profile_step_1_label)
-        binding.progressStep1.setBackgroundColor(getColor(R.color.red_primary))
-        binding.progressStep2.setBackgroundColor(getColor(R.color.border))
+        binding.tvStepIndicator.text =
+            getString(R.string.profile_step_1)
+        binding.tvProgressText.text =
+            getString(R.string.profile_step_1_label)
+        binding.progressStep1.setBackgroundColor(
+            getColor(R.color.red_primary)
+        )
+        binding.progressStep2.setBackgroundColor(
+            getColor(R.color.border)
+        )
         binding.btnAction.text = getString(R.string.profile_btn_next)
         clearStep1Errors()
         updateButtonState()
@@ -132,10 +205,16 @@ class ProfileSetupActivity : AppCompatActivity() {
     private fun showStep2() {
         binding.step1Container.visibility = View.GONE
         binding.step2Container.visibility = View.VISIBLE
-        binding.tvStepIndicator.text = getString(R.string.profile_step_2)
-        binding.tvProgressText.text = getString(R.string.profile_step_2_label)
-        binding.progressStep1.setBackgroundColor(getColor(R.color.red_primary))
-        binding.progressStep2.setBackgroundColor(getColor(R.color.red_primary))
+        binding.tvStepIndicator.text =
+            getString(R.string.profile_step_2)
+        binding.tvProgressText.text =
+            getString(R.string.profile_step_2_label)
+        binding.progressStep1.setBackgroundColor(
+            getColor(R.color.red_primary)
+        )
+        binding.progressStep2.setBackgroundColor(
+            getColor(R.color.red_primary)
+        )
         binding.btnAction.text = getString(R.string.profile_btn_save)
         clearStep2Errors()
         updateButtonState()
@@ -161,10 +240,12 @@ class ProfileSetupActivity : AppCompatActivity() {
                 updateButtonState()
             }
             override fun beforeTextChanged(
-                s: CharSequence?, start: Int, count: Int, after: Int
+                s: CharSequence?, start: Int,
+                count: Int, after: Int
             ) {}
             override fun onTextChanged(
-                s: CharSequence?, start: Int, before: Int, count: Int
+                s: CharSequence?, start: Int,
+                before: Int, count: Int
             ) {}
         }
         binding.etFullName.addTextChangedListener(watcher)
@@ -173,6 +254,8 @@ class ProfileSetupActivity : AppCompatActivity() {
         binding.etContact1Phone.addTextChangedListener(watcher)
         binding.etContact2Name.addTextChangedListener(watcher)
         binding.etContact2Phone.addTextChangedListener(watcher)
+        binding.etContact3Name.addTextChangedListener(watcher)
+        binding.etContact3Phone.addTextChangedListener(watcher)
     }
 
     // ── Click listeners ───────────────────────────────────────
@@ -191,9 +274,8 @@ class ProfileSetupActivity : AppCompatActivity() {
     private fun handleStep1Next() {
         val name = binding.etFullName.text.toString()
         val phone = binding.etPhoneNumber.text.toString()
-        val bloodType = binding.etBloodType.text.toString()
 
-        val error = viewModel.validateStep1(name, phone, bloodType)
+        val error = viewModel.validateStep1(name, phone)
 
         if (error != null) {
             Snackbar.make(
@@ -204,25 +286,31 @@ class ProfileSetupActivity : AppCompatActivity() {
                 if (name.isBlank() || !viewModel.isValidName(name))
                     View.VISIBLE else View.GONE
             binding.tvFullNameError.text =
-                if (name.isBlank()) getString(R.string.profile_field_required)
+                if (name.isBlank())
+                    getString(R.string.profile_field_required)
                 else getString(R.string.profile_name_invalid)
 
             binding.tvPhoneError.visibility =
-                if (phone.isBlank() || !viewModel.isValidCameroonPhone(phone))
+                if (phone.isBlank() ||
+                    !viewModel.isValidCameroonPhone(phone))
                     View.VISIBLE else View.GONE
             binding.tvPhoneError.text =
-                if (phone.isBlank()) getString(R.string.profile_field_required)
+                if (phone.isBlank())
+                    getString(R.string.profile_field_required)
                 else getString(R.string.profile_phone_invalid)
+
             return
         }
 
         clearStep1Errors()
+
         viewModel.saveStep1Data(
             name = name,
             phone = phone,
-            blood = bloodType,
-            allergiesText = binding.etAllergies.text.toString(),
-            conditions = binding.etMedicalConditions.text.toString()
+            allergiesText = binding.etAllergies
+                .text.toString(),
+            conditions = binding.etMedicalConditions
+                .text.toString()
         )
     }
 
@@ -233,13 +321,17 @@ class ProfileSetupActivity : AppCompatActivity() {
         val c1Phone = binding.etContact1Phone.text.toString()
         val c2Name = binding.etContact2Name.text.toString()
         val c2Phone = binding.etContact2Phone.text.toString()
+        val c3Name = binding.etContact3Name.text.toString()
+        val c3Phone = binding.etContact3Phone.text.toString()
 
         val error = viewModel.validateStep2(
             userPhone = viewModel.getUserPhone(),
             c1Name = c1Name,
             c1Phone = c1Phone,
             c2Name = c2Name,
-            c2Phone = c2Phone
+            c2Phone = c2Phone,
+            c3Name = c3Name,
+            c3Phone = c3Phone
         )
 
         if (error != null) {
@@ -248,29 +340,41 @@ class ProfileSetupActivity : AppCompatActivity() {
             ).show()
 
             binding.tvContact1NameError.visibility =
-                if (c1Name.isBlank() || !viewModel.isValidName(c1Name))
+                if (c1Name.isBlank() ||
+                    !viewModel.isValidName(c1Name))
                     View.VISIBLE else View.GONE
             binding.tvContact1NameError.text =
-                if (c1Name.isBlank()) getString(R.string.profile_field_required)
+                if (c1Name.isBlank())
+                    getString(R.string.profile_field_required)
                 else getString(R.string.profile_name_invalid)
 
             binding.tvContact1PhoneError.visibility =
-                if (c1Phone.isBlank() || !viewModel.isValidCameroonPhone(c1Phone))
+                if (c1Phone.isBlank() ||
+                    !viewModel.isValidCameroonPhone(c1Phone))
                     View.VISIBLE else View.GONE
             binding.tvContact1PhoneError.text =
-                if (c1Phone.isBlank()) getString(R.string.profile_field_required)
+                if (c1Phone.isBlank())
+                    getString(R.string.profile_field_required)
                 else getString(R.string.profile_phone_invalid)
+
             return
         }
 
         clearStep2Errors()
+
         viewModel.saveProfile(
             contact1Name = c1Name,
             contact1Phone = c1Phone,
-            contact1Relation = binding.etContact1Relation.text.toString(),
+            contact1Relation = binding.etContact1Relation
+                .text.toString(),
             contact2Name = c2Name,
             contact2Phone = c2Phone,
-            contact2Relation = binding.etContact2Relation.text.toString()
+            contact2Relation = binding.etContact2Relation
+                .text.toString(),
+            contact3Name = c3Name,
+            contact3Phone = c3Phone,
+            contact3Relation = binding.etContact3Relation
+                .text.toString()
         )
     }
 
@@ -292,11 +396,11 @@ class ProfileSetupActivity : AppCompatActivity() {
         binding.btnAction.isEnabled = isValid
         binding.btnAction.backgroundTintList =
             if (isValid)
-                android.content.res.ColorStateList.valueOf(
+                ColorStateList.valueOf(
                     getColor(R.color.red_primary)
                 )
             else
-                android.content.res.ColorStateList.valueOf(
+                ColorStateList.valueOf(
                     getColor(R.color.border)
                 )
 
