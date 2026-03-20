@@ -1,13 +1,335 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical">
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Alerte envoyée"
-        android:textSize="16sp"/>
-</LinearLayout>
+    android:background="@drawable/bg_alert_sending"
+    android:keepScreenOn="true">
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="24dp"
+            android:paddingBottom="24dp">
+
+            <!-- État 1 — Spinner animé -->
+            <FrameLayout
+                android:id="@+id/spinnerContainer"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:id="@+id/spinnerIcon"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:text="↻"
+                    android:textSize="22sp"
+                    android:textColor="#FFFFFF"
+                    android:gravity="center"/>
+
+            </FrameLayout>
+
+            <!-- États 2,3,4 — Icône statut -->
+            <FrameLayout
+                android:id="@+id/iconContainer"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:layout_marginBottom="12dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/tvStatusIcon"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:text="✓"
+                    android:textSize="22sp"
+                    android:textColor="#FFFFFF"
+                    android:gravity="center"
+                    android:background="@drawable/bg_icon_sent"/>
+
+            </FrameLayout>
+
+            <!-- Titre principal -->
+            <TextView
+                android:id="@+id/tvAlertTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/alert_sending_title"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:layout_marginBottom="4dp"/>
+
+            <!-- Heure de l'alerte -->
+            <TextView
+                android:id="@+id/tvAlertTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#8CFFFFFF"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:layout_marginBottom="8dp"/>
+
+            <!-- Description -->
+            <TextView
+                android:id="@+id/tvAlertDesc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/alert_sending_desc"
+                android:textColor="#B3FFFFFF"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:lineSpacingExtra="2dp"
+                android:layout_marginBottom="12dp"/>
+
+            <!-- Status Card — contacts -->
+            <LinearLayout
+                android:id="@+id/statusCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_status_card"
+                android:padding="10dp"
+                android:layout_marginBottom="10dp">
+
+                <!-- Contact 1 -->
+                <LinearLayout
+                    android:id="@+id/contactRow1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp">
+
+                    <View
+                        android:id="@+id/dot1"
+                        android:layout_width="8dp"
+                        android:layout_height="8dp"
+                        android:background="@drawable/shape_circle_orange"
+                        android:layout_marginEnd="8dp"/>
+
+                    <TextView
+                        android:id="@+id/tvContactName1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/tvContactStatus1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#A6FFFFFF"
+                        android:textSize="11sp"/>
+
+                </LinearLayout>
+
+                <!-- Séparateur 1-2 -->
+                <View
+                    android:id="@+id/divider12"
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:background="#14FFFFFF"
+                    android:visibility="gone"/>
+
+                <!-- Contact 2 -->
+                <LinearLayout
+                    android:id="@+id/contactRow2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"
+                    android:visibility="gone">
+
+                    <View
+                        android:id="@+id/dot2"
+                        android:layout_width="8dp"
+                        android:layout_height="8dp"
+                        android:background="@drawable/shape_circle_orange"
+                        android:layout_marginEnd="8dp"/>
+
+                    <TextView
+                        android:id="@+id/tvContactName2"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/tvContactStatus2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#A6FFFFFF"
+                        android:textSize="11sp"/>
+
+                </LinearLayout>
+
+                <!-- Séparateur 2-3 -->
+                <View
+                    android:id="@+id/divider23"
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:background="#14FFFFFF"
+                    android:visibility="gone"/>
+
+                <!-- Contact 3 -->
+                <LinearLayout
+                    android:id="@+id/contactRow3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"
+                    android:visibility="gone">
+
+                    <View
+                        android:id="@+id/dot3"
+                        android:layout_width="8dp"
+                        android:layout_height="8dp"
+                        android:background="@drawable/shape_circle_orange"
+                        android:layout_marginEnd="8dp"/>
+
+                    <TextView
+                        android:id="@+id/tvContactName3"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/tvContactStatus3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#A6FFFFFF"
+                        android:textSize="11sp"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- GPS Card -->
+            <LinearLayout
+                android:id="@+id/gpsCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_gps_card"
+                android:padding="10dp"
+                android:layout_marginBottom="10dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/tvGpsLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/alert_gps_sent"
+                    android:textColor="#73FFFFFF"
+                    android:textSize="10sp"
+                    android:layout_marginBottom="4dp"/>
+
+                <TextView
+                    android:id="@+id/tvGpsCoords"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="2dp"/>
+
+                <TextView
+                    android:id="@+id/tvGpsLink"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#73FFFFFF"
+                    android:textSize="11sp"/>
+
+            </LinearLayout>
+
+            <!-- Boutons urgence -->
+            <LinearLayout
+                android:id="@+id/emergencyButtons"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="8dp"
+                android:visibility="gone">
+
+                <Button
+                    android:id="@+id/btnSamu"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:text="@string/alert_btn_samu"
+                    android:textSize="12sp"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:backgroundTint="#E74C3C"
+                    android:stateListAnimator="@null"
+                    android:layout_marginBottom="4dp"/>
+
+                <Button
+                    android:id="@+id/btnPolice"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:text="@string/alert_btn_police"
+                    android:textSize="12sp"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:backgroundTint="#2980B9"
+                    android:stateListAnimator="@null"
+                    android:layout_marginBottom="4dp"/>
+
+                <Button
+                    android:id="@+id/btnReturnHome"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:text="@string/alert_btn_home"
+                    android:textSize="12sp"
+                    android:textColor="#CCFFFFFF"
+                    android:backgroundTint="#14FFFFFF"
+                    android:stateListAnimator="@null"/>
+
+            </LinearLayout>
+
+            <!-- Notice -->
+            <TextView
+                android:id="@+id/tvNotice"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/alert_notice_sending"
+                android:textColor="#4DFFFFFF"
+                android:textSize="11sp"
+                android:gravity="center"
+                android:textStyle="italic"/>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

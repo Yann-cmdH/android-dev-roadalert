@@ -21,12 +21,37 @@ interface EmergencyContactDAO {
     @Delete
     suspend fun deleteContact(contact: EmergencyContact)
 
-    @Query("SELECT * FROM emergency_contact WHERE userId = :userId ORDER BY priority ASC")
-    fun getContactsByUser(userId: String): Flow<List<EmergencyContact>>
+    // Flow — observé par UI
+    @Query(
+        "SELECT * FROM emergency_contact " +
+                "WHERE userId = :userId " +
+                "ORDER BY priority ASC"
+    )
+    fun getContactsByUser(
+        userId: String
+    ): Flow<List<EmergencyContact>>
 
-    @Query("SELECT COUNT(*) FROM emergency_contact WHERE userId = :userId")
+    // Synchrone — utilisé par AlertManager
+    // Retourne contacts actifs triés par priorité
+    @Query(
+        "SELECT * FROM emergency_contact " +
+                "WHERE userId = :userId " +
+                "AND isActive = 1 " +
+                "ORDER BY priority ASC"
+    )
+    suspend fun getContactsByUserSync(
+        userId: String
+    ): List<EmergencyContact>
+
+    @Query(
+        "SELECT COUNT(*) FROM emergency_contact " +
+                "WHERE userId = :userId"
+    )
     suspend fun getContactCount(userId: String): Int
 
-    @Query("DELETE FROM emergency_contact WHERE id = :contactId")
+    @Query(
+        "DELETE FROM emergency_contact " +
+                "WHERE id = :contactId"
+    )
     suspend fun deleteById(contactId: String)
 }

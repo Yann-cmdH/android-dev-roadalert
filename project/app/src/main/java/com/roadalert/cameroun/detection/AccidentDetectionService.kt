@@ -15,38 +15,60 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.roadalert.cameroun.R
 import com.roadalert.cameroun.RoadAlertApplication
+import com.roadalert.cameroun.data.db.AppDatabase
+import com.roadalert.cameroun.data.db.entity.TriggerType
+import com.roadalert.cameroun.data.repository.AccidentRepository
+import com.roadalert.cameroun.data.repository.UserProfileRepository
 import com.roadalert.cameroun.ui.home.HomeActivity
 import com.roadalert.cameroun.util.ServiceActions
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 
 class AccidentDetectionService : Service(),
     SensorEventListener,
     AccidentListener {
 
-    // ── Capteurs ──────────────────────────────────────────────
+    // ── Capteurs ──────────────────────────────────────────
     private lateinit var sensorManager: SensorManager
     private var accelerometer: Sensor? = null
     private var gyroscope: Sensor? = null
     private var linearAcceleration: Sensor? = null
 
-    // ── Composants détection ──────────────────────────────────
+    // ── Composants détection ──────────────────────────────
     private lateinit var fusionEngine: SensorFusionEngine
     private lateinit var countdownManager: CountdownManager
     private lateinit var capabilityDetector: SensorCapabilityDetector
 
-    // ── État interne ──────────────────────────────────────────
+    // ── AlertManager — Sprint 4 ───────────────────────────
+    private lateinit var alertManager: AlertManager
+
+    // ── Scope coroutines du Service ───────────────────────
+    // SupervisorJob → une coroutine échouée
+    // n'annule pas les autres
+    private val serviceScope = CoroutineScope(
+        Dispatchers.IO + SupervisorJob()
+    )
+
+    // ── État interne ──────────────────────────────────────
     private var isMonitoring = false
 
-    // ── Receiver annulation countdown ─────────────────────────
+    // ── Receiver annulation countdown ─────────────────────
     private val cancelReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            if (intent.action == ServiceActions.ACTION_CANCEL_COUNTDOWN) {
+        override fun onReceive(
+            context: Context,
+            intent: Intent
+        ) {
+            if (intent.action ==
+                ServiceActions.ACTION_CANCEL_COUNTDOWN) {
                 handleCancellation()
             }
         }
     }
     private var isCancelReceiverRegistered = false
 
-    // ── Lifecycle ─────────────────────────────────────────────
+    // ── Lifecycle ─────────────────────────────────────────
 
     override fun onCreate() {
         super.onCreate()
@@ -58,6 +80,21 @@ class AccidentDetectionService : Service(),
         capabilityDetector = SensorCapabilityDetector(this)
         fusionEngine = SensorFusionEngine(this)
         countdownManager = CountdownManager()
+
+        // Initialiser AlertManager avec repositories
+        val database = AppDatabase.getInstance(this)
+        val accidentRepository = AccidentRepository(
+            database.accidentEventDAO()
+        )
+        val userProfileRepository = UserProfileRepository(
+            database.userDAO(),
+            database.emergencyContactDAO()
+        )
+        alertManager = AlertManager(
+            context = this,
+            accidentRepository = accidentRepository,
+            userProfileRepository = userProfileRepository
+        )
 
         registerCancelReceiver()
     }
@@ -91,12 +128,13 @@ class AccidentDetectionService : Service(),
         isMonitoring = false
         broadcastServiceState(false)
         unregisterCancelReceiver()
+        serviceScope.cancel()
         super.onDestroy()
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
 
-    // ── Notification persistante ──────────────────────────────
+    // ── Notification persistante ──────────────────────────
 
     private fun startForegroundWithNotification() {
         val homeIntent = Intent(
@@ -106,9 +144,7 @@ class AccidentDetectionService : Service(),
         }
 
         val pendingIntent = PendingIntent.getActivity(
-            this,
-            0,
-            homeIntent,
+            this, 0, homeIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or
                     PendingIntent.FLAG_IMMUTABLE
         )
@@ -136,12 +172,11 @@ class AccidentDetectionService : Service(),
         )
     }
 
-    // ── Enregistrement capteurs ───────────────────────────────
+    // ── Enregistrement capteurs ───────────────────────────
 
     private fun registerSensors() {
         val mode = capabilityDetector.detectMode()
 
-        // Accéléromètre — Condition 1 — TOUJOURS requis
         accelerometer = sensorManager.getDefaultSensor(
             Sensor.TYPE_ACCELEROMETER
         )
@@ -153,7 +188,6 @@ class AccidentDetectionService : Service(),
         }
 
         if (mode == DetectionMode.FULL_MODE) {
-            // Gyroscope — Condition 2
             gyroscope = sensorManager.getDefaultSensor(
                 Sensor.TYPE_GYROSCOPE
             )
@@ -164,7 +198,6 @@ class AccidentDetectionService : Service(),
                 )
             }
 
-            // Linear Acceleration — Condition 3
             linearAcceleration = sensorManager.getDefaultSensor(
                 Sensor.TYPE_LINEAR_ACCELERATION
             )
@@ -181,11 +214,11 @@ class AccidentDetectionService : Service(),
         try {
             sensorManager.unregisterListener(this)
         } catch (e: Exception) {
-            // Ignoré — capteurs déjà désenregistrés
+            // Ignoré
         }
     }
 
-    // ── SensorEventListener ───────────────────────────────────
+    // ── SensorEventListener ───────────────────────────────
 
     override fun onSensorChanged(event: SensorEvent) {
         if (!isMonitoring) return
@@ -198,19 +231,15 @@ class AccidentDetectionService : Service(),
     override fun onAccuracyChanged(
         sensor: Sensor,
         accuracy: Int
-    ) {
-        // Non utilisé
-    }
+    ) {}
 
-    // ── AccidentListener ──────────────────────────────────────
+    // ── AccidentListener ──────────────────────────────────
 
     override fun onAccidentDetected(confidence: Float) {
-        // Démarrer le countdown
         countdownManager.start {
-            onCountdownFinished()
+            onCountdownFinished(confidence)
         }
 
-        // Notifier l'UI — ouvrir CountdownActivity
         val intent = Intent(
             ServiceActions.ACTION_ACCIDENT_DETECTED
         ).apply {
@@ -218,45 +247,40 @@ class AccidentDetectionService : Service(),
                 ServiceActions.EXTRA_CONFIDENCE,
                 confidence
             )
-            // Package explicite pour sécurité Android 13+
             setPackage(packageName)
         }
         sendBroadcast(intent)
     }
 
-    override fun onConditionProgress(step: Int) {
-        // Log progression pour debug — non utilisé en production
-    }
+    override fun onConditionProgress(step: Int) {}
 
-    // ── Countdown terminé — accident confirmé ─────────────────
+    // ── Countdown terminé — DÉCLENCHE ALERTMANAGER ────────
 
-    private fun onCountdownFinished() {
-        // Arrêter la détection pendant le traitement
+    private fun onCountdownFinished(
+        confidence: Float = 0f
+    ) {
+        // Arrêter la détection pendant l'alerte
         fusionEngine.stopMonitoring()
         isMonitoring = false
         unregisterSensors()
 
-        // Notifier Sprint 4 — AlertManager
-        val intent = Intent(
-            ServiceActions.ACTION_ACCIDENT_CONFIRMED
-        ).apply {
-            setPackage(packageName)
-        }
-        sendBroadcast(intent)
+        // Déclencher AlertManager — TriggerType.AUTO
+        alertManager.triggerAlert(
+            triggerType = TriggerType.AUTO,
+            gForceValue = confidence,
+            scope = serviceScope
+        )
     }
 
-    // ── Annulation countdown ──────────────────────────────────
+    // ── Annulation countdown ──────────────────────────────
 
     private fun handleCancellation() {
-        // Annuler le countdown
         countdownManager.cancel()
 
-        // Réinitialiser le moteur de détection
         fusionEngine.reset()
         fusionEngine.startMonitoring()
         isMonitoring = true
 
-        // Notifier l'UI
         val intent = Intent(
             ServiceActions.ACTION_ACCIDENT_CANCELLED
         ).apply {
@@ -265,7 +289,18 @@ class AccidentDetectionService : Service(),
         sendBroadcast(intent)
     }
 
-    // ── Broadcast état service ────────────────────────────────
+    // ── Reprendre surveillance après alerte ───────────────
+    // Appelé par AlertManager quand l'alerte est terminée
+
+    fun resumeMonitoring() {
+        if (!isMonitoring) {
+            registerSensors()
+            fusionEngine.startMonitoring()
+            isMonitoring = true
+        }
+    }
+
+    // ── Broadcast état service ────────────────────────────
 
     private fun broadcastServiceState(isRunning: Boolean) {
         val intent = Intent(
@@ -280,7 +315,7 @@ class AccidentDetectionService : Service(),
         sendBroadcast(intent)
     }
 
-    // ── Register cancel receiver — Android 13+ safe ───────────
+    // ── Register cancel receiver ──────────────────────────
 
     private fun registerCancelReceiver() {
         if (isCancelReceiverRegistered) return
@@ -289,7 +324,8 @@ class AccidentDetectionService : Service(),
             ServiceActions.ACTION_CANCEL_COUNTDOWN
         )
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        if (Build.VERSION.SDK_INT >=
+            Build.VERSION_CODES.TIRAMISU) {
             registerReceiver(
                 cancelReceiver,
                 filter,
@@ -308,7 +344,7 @@ class AccidentDetectionService : Service(),
             unregisterReceiver(cancelReceiver)
             isCancelReceiverRegistered = false
         } catch (e: IllegalArgumentException) {
-            // Ignoré — receiver déjà désenregistré
+            // Ignoré
         }
     }
 }

@@ -23,15 +23,24 @@
         android:required="false" />
 
     <!-- ══ PERMISSIONS (SAD section 8) ══════════════════════ -->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.SEND_SMS" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission
+        android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission
+        android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission
+        android:name="android.permission.SEND_SMS" />
+    <uses-permission
+        android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission
+        android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+    <uses-permission
+        android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission
+        android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission
+        android:name="android.permission.CAMERA" />
+    <uses-permission
+        android:name="android.permission.VIBRATE" />
     <uses-permission
         android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
@@ -63,38 +72,75 @@
         <activity
             android:name=".ui.onboarding.OnboardingActivity"
             android:exported="false" />
+
         <activity
             android:name=".ui.profile.ProfileSetupActivity"
             android:exported="false" />
+
         <activity
             android:name=".ui.home.HomeActivity"
             android:exported="false" />
+
         <activity
             android:name=".ui.countdown.CountdownActivity"
-            android:screenOrientation="portrait"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!--
+            AlertSentActivity :
+            showOnLockScreen + turnScreenOn
+            → Si accident la nuit téléphone verrouillé
+            → L'écran s'allume automatiquement
+            → L'utilisateur voit l'alerte immédiatement
+        -->
         <activity
             android:name=".ui.alert.AlertSentActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:showOnLockScreen="true"
+            android:turnScreenOn="true" />
+
         <activity
             android:name=".ui.history.HistoryActivity"
             android:exported="false" />
+
         <activity
             android:name=".ui.settings.SettingsActivity"
             android:exported="false" />
 
         <!-- ── ForegroundService (SAD AD-04) ──────────────── -->
+        <!--
+            foregroundServiceType="location"
+            → Obligatoire Android 10+
+            → AccidentDetectionService utilise GPS
+        -->
         <service
             android:name=".detection.AccidentDetectionService"
             android:exported="false"
             android:foregroundServiceType="location" />
 
-        <!-- ── BroadcastReceiver (SAD section 8) ──────────── -->
+        <!-- ── WorkManager Provider ───────────────────────── -->
+        <!--
+            WorkManager s'initialise automatiquement
+            via ContentProvider — pas besoin de
+            déclarer manuellement si on utilise
+            work-runtime-ktx ✅
+        -->
+
+        <!-- ── BootCompletedReceiver ──────────────────────── -->
+        <!--
+            exported="true" OBLIGATOIRE
+            → Sans ça Android ne livre jamais
+              ACTION_BOOT_COMPLETED
+            → Le service ne redémarre jamais
+              après reboot
+        -->
         <receiver
             android:name=".alert.BootCompletedReceiver"
-            android:exported="false">
+            android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action
+                    android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 

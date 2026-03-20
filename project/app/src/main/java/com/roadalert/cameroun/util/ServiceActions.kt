@@ -20,6 +20,13 @@ object ServiceActions {
     const val ACTION_SERVICE_STATE_CHANGED =
         "com.roadalert.cameroun.ACTION_SERVICE_STATE_CHANGED"
 
+    // ── Actions AlertManager → AlertSentActivity ──────────────
+
+    // Résultat de l'alerte — notifie AlertSentActivity
+    // Envoyé quand AlertManager a terminé l'envoi des SMS
+    const val ACTION_ALERT_RESULT =
+        "com.roadalert.cameroun.ACTION_ALERT_RESULT"
+
     // ── Actions UI → Service ──────────────────────────────────
 
     // Démarrer le service
@@ -34,7 +41,7 @@ object ServiceActions {
     const val ACTION_CANCEL_COUNTDOWN =
         "com.roadalert.cameroun.ACTION_CANCEL_COUNTDOWN"
 
-    // ── Extras ────────────────────────────────────────────────
+    // ── Extras existants ──────────────────────────────────────
 
     // Confiance de la détection (0.0 à 1.0)
     const val EXTRA_CONFIDENCE =
@@ -47,4 +54,19 @@ object ServiceActions {
     // Mode de détection
     const val EXTRA_DETECTION_MODE =
         "com.roadalert.cameroun.EXTRA_DETECTION_MODE"
+
+    // ── Extras Sprint 4 ───────────────────────────────────────
+
+    // ID de l'AccidentEvent — passé à AlertSentActivity
+    // AlertSentViewModel l'utilise pour observer Room
+    const val EXTRA_ACCIDENT_EVENT_ID =
+        "com.roadalert.cameroun.EXTRA_ACCIDENT_EVENT_ID"
+
+    // Type de déclenchement — AUTO ou MANUAL
+    const val EXTRA_TRIGGER_TYPE =
+        "com.roadalert.cameroun.EXTRA_TRIGGER_TYPE"
+
+    // Statut final de l'alerte — passé dans ACTION_ALERT_RESULT
+    const val EXTRA_ALERT_STATUS =
+        "com.roadalert.cameroun.EXTRA_ALERT_STATUS"
 }

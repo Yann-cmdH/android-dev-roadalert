@@ -58,7 +58,6 @@ class ProfileViewModel(
         "AB+", "AB-"
     )
 
-    // bloodType sélectionné par l'utilisateur
     private val _selectedBloodType = MutableStateFlow<String?>(null)
     val selectedBloodType: StateFlow<String?> = _selectedBloodType
 
@@ -80,7 +79,7 @@ class ProfileViewModel(
         _isContact3Visible.value = true
     }
 
-    // ── Phone de l'utilisateur pour validation doublons ───────
+    // ── Phone utilisateur pour validation doublons ────────────
 
     fun getUserPhone(): String = phoneNumber
 
@@ -126,9 +125,9 @@ class ProfileViewModel(
         if (!isValidName(name))
             return "Le nom ne peut pas contenir de chiffres"
         if (phone.isBlank())
-            return "Le numéro de téléphone est obligatoire"
+            return "Le numero de telephone est obligatoire"
         if (!isValidCameroonPhone(phone))
-            return "Numéro invalide — 9 chiffres commençant par 6"
+            return "Numero invalide — 9 chiffres commencant par 6"
         return null
     }
 
@@ -141,48 +140,50 @@ class ProfileViewModel(
         c3Name: String,
         c3Phone: String
     ): String? {
-        // Contact 1 obligatoire
         if (c1Name.isBlank())
             return "Le nom du Contact 1 est obligatoire"
         if (!isValidName(c1Name))
             return "Nom Contact 1 invalide"
         if (c1Phone.isBlank())
-            return "Le téléphone du Contact 1 est obligatoire"
+            return "Le telephone du Contact 1 est obligatoire"
         if (!isValidCameroonPhone(c1Phone))
-            return "Contact 1 — numéro invalide (ex: 677654321)"
+            return "Contact 1 — numero invalide (ex: 677654321)"
         if (c1Phone == userPhone)
-            return "Le Contact 1 ne peut pas avoir votre propre numéro"
+            return "Le Contact 1 ne peut pas avoir votre propre numero"
 
-        // Contact 2 optionnel
         if (!isContactValid(c2Name, c2Phone))
-            return "Contact 2 incomplet — remplissez nom et téléphone ou laissez les deux vides"
+            return "Contact 2 incomplet — remplissez nom et telephone ou laissez les deux vides"
         if (c2Phone.isNotBlank() && !isValidCameroonPhone(c2Phone))
-            return "Contact 2 — numéro invalide (ex: 677654321)"
+            return "Contact 2 — numero invalide (ex: 677654321)"
         if (c2Phone.isNotBlank() && c2Phone == userPhone)
-            return "Le Contact 2 ne peut pas avoir votre propre numéro"
+            return "Le Contact 2 ne peut pas avoir votre propre numero"
 
-        // Contact 3 optionnel
         if (!isContactValid(c3Name, c3Phone))
-            return "Contact 3 incomplet — remplissez nom et téléphone ou laissez les deux vides"
+            return "Contact 3 incomplet — remplissez nom et telephone ou laissez les deux vides"
         if (c3Phone.isNotBlank() && !isValidCameroonPhone(c3Phone))
-            return "Contact 3 — numéro invalide (ex: 677654321)"
+            return "Contact 3 — numero invalide (ex: 677654321)"
         if (c3Phone.isNotBlank() && c3Phone == userPhone)
-            return "Le Contact 3 ne peut pas avoir votre propre numéro"
+            return "Le Contact 3 ne peut pas avoir votre propre numero"
 
-        // Doublons entre tous les contacts
         if (hasDuplicatePhones(userPhone, c1Phone, c2Phone, c3Phone))
-            return "Deux contacts ne peuvent pas avoir le même numéro"
+            return "Deux contacts ne peuvent pas avoir le meme numero"
 
         return null
     }
 
     // ── Bouton actif ──────────────────────────────────────────
 
-    fun isStep1ButtonEnabled(name: String, phone: String): Boolean {
+    fun isStep1ButtonEnabled(
+        name: String,
+        phone: String
+    ): Boolean {
         return name.isNotBlank() && phone.isNotBlank()
     }
 
-    fun isStep2ButtonEnabled(c1Name: String, c1Phone: String): Boolean {
+    fun isStep2ButtonEnabled(
+        c1Name: String,
+        c1Phone: String
+    ): Boolean {
         return c1Name.isNotBlank() && c1Phone.isNotBlank()
     }
 
@@ -231,8 +232,14 @@ class ProfileViewModel(
             _errorMessage.value = null
 
             try {
-                val userId = IdGenerator.newId()
                 val now = System.currentTimeMillis()
+
+                // Vérifier si profil existe déjà
+                // Si oui → conserver le même userId
+                // pour éviter la duplication en Room
+                val existingUser = repository.getUserSync()
+                val userId = existingUser?.id
+                    ?: IdGenerator.newId()
 
                 val user = User(
                     id = userId,
@@ -240,8 +247,9 @@ class ProfileViewModel(
                     phoneNumber = phoneNumber,
                     bloodType = bloodType,
                     allergies = allergies.ifBlank { null },
-                    medicalConditions = medicalConditions.ifBlank { null },
-                    createdAt = now,
+                    medicalConditions =
+                    medicalConditions.ifBlank { null },
+                    createdAt = existingUser?.createdAt ?: now,
                     updatedAt = now
                 )
 
@@ -250,43 +258,49 @@ class ProfileViewModel(
                 // Contact 1 — obligatoire
                 if (contact1Name.isNotBlank() &&
                     contact1Phone.isNotBlank()) {
-                    contacts.add(EmergencyContact(
-                        id = IdGenerator.newId(),
-                        userId = userId,
-                        name = contact1Name.trim(),
-                        phoneNumber = contact1Phone.trim(),
-                        relation = contact1Relation.trim(),
-                        priority = 1,
-                        isActive = true
-                    ))
+                    contacts.add(
+                        EmergencyContact(
+                            id = IdGenerator.newId(),
+                            userId = userId,
+                            name = contact1Name.trim(),
+                            phoneNumber = contact1Phone.trim(),
+                            relation = contact1Relation.trim(),
+                            priority = 1,
+                            isActive = true
+                        )
+                    )
                 }
 
                 // Contact 2 — optionnel
                 if (contact2Name.isNotBlank() &&
                     contact2Phone.isNotBlank()) {
-                    contacts.add(EmergencyContact(
-                        id = IdGenerator.newId(),
-                        userId = userId,
-                        name = contact2Name.trim(),
-                        phoneNumber = contact2Phone.trim(),
-                        relation = contact2Relation.trim(),
-                        priority = 2,
-                        isActive = true
-                    ))
+                    contacts.add(
+                        EmergencyContact(
+                            id = IdGenerator.newId(),
+                            userId = userId,
+                            name = contact2Name.trim(),
+                            phoneNumber = contact2Phone.trim(),
+                            relation = contact2Relation.trim(),
+                            priority = 2,
+                            isActive = true
+                        )
+                    )
                 }
 
                 // Contact 3 — optionnel
                 if (contact3Name.isNotBlank() &&
                     contact3Phone.isNotBlank()) {
-                    contacts.add(EmergencyContact(
-                        id = IdGenerator.newId(),
-                        userId = userId,
-                        name = contact3Name.trim(),
-                        phoneNumber = contact3Phone.trim(),
-                        relation = contact3Relation.trim(),
-                        priority = 3,
-                        isActive = true
-                    ))
+                    contacts.add(
+                        EmergencyContact(
+                            id = IdGenerator.newId(),
+                            userId = userId,
+                            name = contact3Name.trim(),
+                            phoneNumber = contact3Phone.trim(),
+                            relation = contact3Relation.trim(),
+                            priority = 3,
+                            isActive = true
+                        )
+                    )
                 }
 
                 repository.saveProfileWithContacts(user, contacts)
@@ -294,7 +308,7 @@ class ProfileViewModel(
 
             } catch (e: Exception) {
                 _errorMessage.value =
-                    "Erreur lors de la sauvegarde. Veuillez réessayer."
+                    "Erreur lors de la sauvegarde. Veuillez reessayer."
             } finally {
                 _isLoading.value = false
             }
