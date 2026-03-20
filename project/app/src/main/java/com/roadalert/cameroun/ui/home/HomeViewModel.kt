@@ -1,16 +1,21 @@
 package com.roadalert.cameroun.ui.home
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.roadalert.cameroun.data.db.entity.TriggerType
 import com.roadalert.cameroun.data.db.entity.User
 import com.roadalert.cameroun.data.repository.UserProfileRepository
+import com.roadalert.cameroun.detection.AlertManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
-    private val repository: UserProfileRepository
-) : ViewModel() {
+    application: Application,
+    private val userProfileRepository: UserProfileRepository,
+    private val alertManager: AlertManager
+) : AndroidViewModel(application) {
 
     private val _user = MutableStateFlow<User?>(null)
     val user: StateFlow<User?> = _user
@@ -23,7 +28,7 @@ class HomeViewModel(
 
     fun loadUser() {
         viewModelScope.launch {
-            repository.getUser().collect { user ->
+            userProfileRepository.getUser().collect { user ->
                 _user.value = user
             }
         }
@@ -41,7 +46,13 @@ class HomeViewModel(
         _showSosDialog.value = false
     }
 
+    // ── SOS confirmé — déclenche AlertManager MANUAL ──────
     fun onSosConfirmed() {
         _showSosDialog.value = false
+        alertManager.triggerAlert(
+            triggerType = TriggerType.MANUAL,
+            gForceValue = 0f,
+            scope = viewModelScope
+        )
     }
 }

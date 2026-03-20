@@ -17,7 +17,7 @@ import com.roadalert.cameroun.data.db.entity.User
         EmergencyContact::class,
         AccidentEvent::class
     ],
-    version = 1,
+    version = 4,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -27,6 +27,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun accidentEventDAO(): AccidentEventDAO
 
     companion object {
+
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
@@ -36,7 +37,9 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "roadalert.db"
-                ).build()
+                )
+                    .fallbackToDestructiveMigration()
+                    .build()
                 INSTANCE = instance
                 instance
             }

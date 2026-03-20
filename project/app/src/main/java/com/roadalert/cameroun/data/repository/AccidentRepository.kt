@@ -9,39 +9,86 @@ class AccidentRepository(
     private val accidentEventDAO: AccidentEventDAO
 ) {
 
-    // ── Save a new accident event ─────────────────────────────
+    // ── Sauvegarde d'un nouvel accident ───────────────────
 
-    suspend fun saveEvent(event: AccidentEvent) {
-        accidentEventDAO.insertEvent(event)
+    suspend fun saveAccidentEvent(event: AccidentEvent) {
+        accidentEventDAO.insertAccidentEvent(event)
     }
 
-    // ── Get full history ordered by timestamp DESC ────────────
+    // ── Mise à jour complète d'un accident ────────────────
 
-    fun getHistory(): Flow<List<AccidentEvent>> {
-        return accidentEventDAO.getAllEvents()
+    suspend fun updateAccidentEvent(event: AccidentEvent) {
+        accidentEventDAO.updateAccidentEvent(event)
     }
 
-    // ── Get single event by id ────────────────────────────────
+    // ── Observer un accident en temps réel ───────────────
+    // AlertSentViewModel l'utilise pour mettre à jour l'UI
 
-    suspend fun getEventById(eventId: String): AccidentEvent? {
-        return accidentEventDAO.getEventById(eventId)
+    fun observeAccidentEvent(
+        eventId: String
+    ): Flow<AccidentEvent?> {
+        return accidentEventDAO.getAccidentEventById(eventId)
     }
 
-    // ── Update alert status after dispatch ───────────────────
+    // ── Lecture synchrone — RetryWorker ───────────────────
 
-    suspend fun updateStatus(eventId: String, status: AlertStatus) {
-        accidentEventDAO.updateStatus(eventId, status)
+    suspend fun getAccidentEventById(
+        eventId: String
+    ): AccidentEvent? {
+        return accidentEventDAO.getAccidentEventByIdSync(eventId)
     }
 
-    // ── Get all events pending retry (SAD NFR04) ──────────────
+    // ── Tous les accidents — HistoryActivity Sprint 5 ─────
 
-    suspend fun getPendingRetries(): List<AccidentEvent> {
-        return accidentEventDAO.getPendingRetries()
+    fun getAllAccidentEvents(
+        userId: String
+    ): Flow<List<AccidentEvent>> {
+        return accidentEventDAO.getAllAccidentEvents(userId)
     }
 
-    // ── Increment retry count after failed attempt ────────────
+    // ── Accidents en attente de retry ─────────────────────
+
+    suspend fun getPendingRetryEvents(): List<AccidentEvent> {
+        return accidentEventDAO.getPendingRetryEvents()
+    }
+
+    // ── Mise à jour statut global ─────────────────────────
+
+    suspend fun updateAlertStatus(
+        eventId: String,
+        status: AlertStatus
+    ) {
+        accidentEventDAO.updateAlertStatus(
+            eventId,
+            status.name
+        )
+    }
+
+    // ── Mise à jour position GPS ──────────────────────────
+
+    suspend fun updateLocation(
+        eventId: String,
+        latitude: Double,
+        longitude: Double,
+        isApproximate: Boolean
+    ) {
+        accidentEventDAO.updateLocation(
+            eventId,
+            latitude,
+            longitude,
+            isApproximate
+        )
+    }
+
+    // ── Incrémenter retry count ───────────────────────────
 
     suspend fun incrementRetryCount(eventId: String) {
         accidentEventDAO.incrementRetryCount(eventId)
+    }
+
+    // ── Nombre total d'accidents ──────────────────────────
+
+    suspend fun getAccidentCount(userId: String): Int {
+        return accidentEventDAO.getAccidentCount(userId)
     }
 }

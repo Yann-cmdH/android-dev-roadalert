@@ -11,10 +11,16 @@ class UserProfileRepository(
     private val emergencyContactDAO: EmergencyContactDAO
 ) {
 
-    // ── User operations ──────────────────────────────────────
+    // ── User operations ───────────────────────────────────
 
     fun getUser(): Flow<User?> {
         return userDAO.getUser()
+    }
+
+    // Synchrone — utilisé par AlertManager
+    // et BootCompletedReceiver
+    suspend fun getUserSync(): User? {
+        return userDAO.getUserSync()
     }
 
     suspend fun saveUser(user: User) {
@@ -22,17 +28,46 @@ class UserProfileRepository(
     }
 
     suspend fun updateUser(user: User) {
-        userDAO.updateUser(user)
+        userDAO.updateUser(
+            user.copy(updatedAt = System.currentTimeMillis())
+        )
     }
+
+    // ── isProfileComplete ─────────────────────────────────
 
     suspend fun isProfileComplete(): Boolean {
-        return userDAO.getUserCount() > 0
+        val user = userDAO.getUserSync() ?: return false
+        return emergencyContactDAO
+            .getContactCount(user.id) > 0
     }
 
-    // ── Emergency contacts operations ────────────────────────
+    // ── Sauvegarde atomique ───────────────────────────────
 
-    fun getContacts(userId: String): Flow<List<EmergencyContact>> {
+    suspend fun saveProfileWithContacts(
+        user: User,
+        contacts: List<EmergencyContact>
+    ) {
+        userDAO.insertUser(user)
+        contacts.forEach { contact ->
+            emergencyContactDAO.insertContact(contact)
+        }
+    }
+
+    // ── Emergency contacts operations ─────────────────────
+
+    fun getContacts(
+        userId: String
+    ): Flow<List<EmergencyContact>> {
         return emergencyContactDAO.getContactsByUser(userId)
+    }
+
+    // Synchrone — utilisé par AlertManager
+    // Retourne contacts triés par priorité
+    suspend fun getContactsSync(
+        userId: String
+    ): List<EmergencyContact> {
+        return emergencyContactDAO
+            .getContactsByUserSync(userId)
     }
 
     suspend fun saveContact(contact: EmergencyContact) {
@@ -48,6 +83,7 @@ class UserProfileRepository(
     }
 
     suspend fun hasContacts(userId: String): Boolean {
-        return emergencyContactDAO.getContactCount(userId) > 0
+        return emergencyContactDAO
+            .getContactCount(userId) > 0
     }
 }
