@@ -14,7 +14,7 @@ class ProfileViewModel(
     private val repository: UserProfileRepository
 ) : ViewModel() {
 
-    // ── UI State ──────────────────────────────────────────────
+    // ── UI State ──────────────────────────────────────────
 
     private val _currentStep = MutableStateFlow(1)
     val currentStep: StateFlow<Int> = _currentStep
@@ -28,7 +28,7 @@ class ProfileViewModel(
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage
 
-    // ── Step 1 data — kept in memory until atomic save ───────
+    // ── Step 1 data — kept in memory until atomic save ────
 
     private var fullName: String = ""
     private var phoneNumber: String = ""
@@ -36,7 +36,7 @@ class ProfileViewModel(
     private var allergies: String = ""
     private var medicalConditions: String = ""
 
-    // ── Step 1 pré-remplissage au retour ─────────────────────
+    // ── Step 1 pré-remplissage ────────────────────────────
 
     private val _step1Data = MutableStateFlow<Step1Data?>(null)
     val step1Data: StateFlow<Step1Data?> = _step1Data
@@ -49,7 +49,14 @@ class ProfileViewModel(
         val medicalConditions: String
     )
 
-    // ── Groupe sanguin — valeurs fixes SAD DEC-01 ─────────────
+    // ── Contacts existants — pré-remplissage étape 2 ──────
+
+    private val _existingContacts =
+        MutableStateFlow<List<EmergencyContact>>(emptyList())
+    val existingContacts: StateFlow<List<EmergencyContact>> =
+        _existingContacts
+
+    // ── Groupe sanguin — valeurs fixes SAD DEC-01 ─────────
 
     val bloodTypeOptions = listOf(
         "A+", "A-",
@@ -58,8 +65,10 @@ class ProfileViewModel(
         "AB+", "AB-"
     )
 
-    private val _selectedBloodType = MutableStateFlow<String?>(null)
-    val selectedBloodType: StateFlow<String?> = _selectedBloodType
+    private val _selectedBloodType =
+        MutableStateFlow<String?>(null)
+    val selectedBloodType: StateFlow<String?> =
+        _selectedBloodType
 
     fun selectBloodType(type: String?) {
         _selectedBloodType.value = type
@@ -70,20 +79,73 @@ class ProfileViewModel(
         return _selectedBloodType.value == type
     }
 
-    // ── Contact 3 visible ─────────────────────────────────────
+    // ── Contact 3 visible ─────────────────────────────────
 
     private val _isContact3Visible = MutableStateFlow(false)
-    val isContact3Visible: StateFlow<Boolean> = _isContact3Visible
+    val isContact3Visible: StateFlow<Boolean> =
+        _isContact3Visible
 
     fun showContact3() {
         _isContact3Visible.value = true
     }
 
-    // ── Phone utilisateur pour validation doublons ────────────
+    // ── Chargement données existantes au démarrage ────────
+    // Utilisé quand on ouvre depuis Settings pour modifier
+    // init() charge les données Room existantes
+    // pour pré-remplir les champs
+
+    init {
+        loadExistingData()
+    }
+
+    private fun loadExistingData() {
+        viewModelScope.launch {
+            val existingUser = repository.getUserSync()
+            existingUser?.let { user ->
+                // Pré-remplir les champs mémoire
+                fullName = user.fullName
+                phoneNumber = user.phoneNumber
+                bloodType = user.bloodType
+                allergies = user.allergies ?: ""
+                medicalConditions = user.medicalConditions ?: ""
+
+                // Exposer à l'Activity pour pré-remplissage UI
+                _selectedBloodType.value = user.bloodType
+                _step1Data.value = Step1Data(
+                    fullName = fullName,
+                    phoneNumber = phoneNumber,
+                    bloodType = bloodType,
+                    allergies = allergies,
+                    medicalConditions = medicalConditions
+                )
+
+                // Charger les contacts existants
+                val contacts = repository
+                    .getContactsSync(user.id)
+                _existingContacts.value = contacts
+
+                // Si contacts existent → afficher contact 3
+                if (contacts.size >= 3) {
+                    _isContact3Visible.value = true
+                }
+            }
+        }
+    }
+
+    // ── Aller directement à l'étape 2 ────────────────────
+    // Utilisé quand on ouvre depuis Settings
+    // avec extra START_STEP = 2
+
+    fun goToStep2Direct() {
+        // Données déjà chargées par loadExistingData()
+        _currentStep.value = 2
+    }
+
+    // ── Phone utilisateur pour validation doublons ────────
 
     fun getUserPhone(): String = phoneNumber
 
-    // ── VALIDATION ────────────────────────────────────────────
+    // ── VALIDATION ────────────────────────────────────────
 
     fun isValidCameroonPhone(phone: String): Boolean {
         return phone.trim().matches(Regex("^6[0-9]{8}$"))
@@ -114,8 +176,9 @@ class ProfileViewModel(
         c2Phone: String,
         c3Phone: String
     ): Boolean {
-        val phones = listOf(userPhone, c1Phone, c2Phone, c3Phone)
-            .filter { it.isNotBlank() }
+        val phones = listOf(
+            userPhone, c1Phone, c2Phone, c3Phone
+        ).filter { it.isNotBlank() }
         return phones.size != phones.distinct().size
     }
 
@@ -127,7 +190,7 @@ class ProfileViewModel(
         if (phone.isBlank())
             return "Le numero de telephone est obligatoire"
         if (!isValidCameroonPhone(phone))
-            return "Numero invalide — 9 chiffres commencant par 6"
+            return "Numero invalide - 9 chiffres commencant par 6"
         return null
     }
 
@@ -147,21 +210,21 @@ class ProfileViewModel(
         if (c1Phone.isBlank())
             return "Le telephone du Contact 1 est obligatoire"
         if (!isValidCameroonPhone(c1Phone))
-            return "Contact 1 — numero invalide (ex: 677654321)"
+            return "Contact 1 - numero invalide (ex: 677654321)"
         if (c1Phone == userPhone)
             return "Le Contact 1 ne peut pas avoir votre propre numero"
 
         if (!isContactValid(c2Name, c2Phone))
-            return "Contact 2 incomplet — remplissez nom et telephone ou laissez les deux vides"
+            return "Contact 2 incomplet - remplissez nom et telephone ou laissez les deux vides"
         if (c2Phone.isNotBlank() && !isValidCameroonPhone(c2Phone))
-            return "Contact 2 — numero invalide (ex: 677654321)"
+            return "Contact 2 - numero invalide (ex: 677654321)"
         if (c2Phone.isNotBlank() && c2Phone == userPhone)
             return "Le Contact 2 ne peut pas avoir votre propre numero"
 
         if (!isContactValid(c3Name, c3Phone))
-            return "Contact 3 incomplet — remplissez nom et telephone ou laissez les deux vides"
+            return "Contact 3 incomplet - remplissez nom et telephone ou laissez les deux vides"
         if (c3Phone.isNotBlank() && !isValidCameroonPhone(c3Phone))
-            return "Contact 3 — numero invalide (ex: 677654321)"
+            return "Contact 3 - numero invalide (ex: 677654321)"
         if (c3Phone.isNotBlank() && c3Phone == userPhone)
             return "Le Contact 3 ne peut pas avoir votre propre numero"
 
@@ -171,7 +234,7 @@ class ProfileViewModel(
         return null
     }
 
-    // ── Bouton actif ──────────────────────────────────────────
+    // ── Bouton actif ──────────────────────────────────────
 
     fun isStep1ButtonEnabled(
         name: String,
@@ -187,7 +250,7 @@ class ProfileViewModel(
         return c1Name.isNotBlank() && c1Phone.isNotBlank()
     }
 
-    // ── Step 1 actions ────────────────────────────────────────
+    // ── Step 1 actions ────────────────────────────────────
 
     fun saveStep1Data(
         name: String,
@@ -214,7 +277,7 @@ class ProfileViewModel(
         _currentStep.value = 1
     }
 
-    // ── Sauvegarde atomique ───────────────────────────────────
+    // ── Sauvegarde atomique ───────────────────────────────
 
     fun saveProfile(
         contact1Name: String,
@@ -234,9 +297,6 @@ class ProfileViewModel(
             try {
                 val now = System.currentTimeMillis()
 
-                // Vérifier si profil existe déjà
-                // Si oui → conserver le même userId
-                // pour éviter la duplication en Room
                 val existingUser = repository.getUserSync()
                 val userId = existingUser?.id
                     ?: IdGenerator.newId()
@@ -255,7 +315,6 @@ class ProfileViewModel(
 
                 val contacts = mutableListOf<EmergencyContact>()
 
-                // Contact 1 — obligatoire
                 if (contact1Name.isNotBlank() &&
                     contact1Phone.isNotBlank()) {
                     contacts.add(
@@ -271,7 +330,6 @@ class ProfileViewModel(
                     )
                 }
 
-                // Contact 2 — optionnel
                 if (contact2Name.isNotBlank() &&
                     contact2Phone.isNotBlank()) {
                     contacts.add(
@@ -287,7 +345,6 @@ class ProfileViewModel(
                     )
                 }
 
-                // Contact 3 — optionnel
                 if (contact3Name.isNotBlank() &&
                     contact3Phone.isNotBlank()) {
                     contacts.add(

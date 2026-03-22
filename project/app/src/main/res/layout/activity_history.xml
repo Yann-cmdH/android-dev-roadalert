@@ -1,15 +1,217 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="#F5F5F5">
 
+    <!-- ── TopBar gradient rouge ─────────────────────────── -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="14dp"
+        android:minHeight="44dp"
+        android:background="@drawable/bg_topbar_red">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_arrow_back_white"
+            android:contentDescription="Retour"
+            android:padding="2dp"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="@string/history_title"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"/>
+
+    </LinearLayout>
+
+    <!-- ── Tabs filtres ───────────────────────────────────── -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="38dp"
+        android:orientation="horizontal"
+        android:background="#FFFFFF">
+
+        <!-- Tab 1 — Tous -->
+        <TextView
+            android:id="@+id/tabAll"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/history_filter_all"
+            android:textSize="9sp"
+            android:textColor="#C0392B"
+            android:textStyle="bold"
+            android:gravity="center"/>
+
+        <!-- Séparateur vertical -->
+        <View
+            android:layout_width="0.5dp"
+            android:layout_height="match_parent"
+            android:background="#EEEEEE"/>
+
+        <!-- Tab 2 — Accidents -->
+        <TextView
+            android:id="@+id/tabAccidents"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/history_filter_accidents"
+            android:textSize="9sp"
+            android:textColor="#7F8C8D"
+            android:gravity="center"/>
+
+        <!-- Séparateur vertical -->
+        <View
+            android:layout_width="0.5dp"
+            android:layout_height="match_parent"
+            android:background="#EEEEEE"/>
+
+        <!-- Tab 3 — SOS -->
+        <TextView
+            android:id="@+id/tabSos"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/history_filter_sos"
+            android:textSize="9sp"
+            android:textColor="#7F8C8D"
+            android:gravity="center"/>
+
+    </LinearLayout>
+
+    <!-- Indicateur tab souligné — déplacé programmatiquement -->
+    <View
+        android:id="@+id/tabIndicator"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="#C0392B"/>
+
+    <!-- ── Stats bar ──────────────────────────────────────── -->
     <TextView
+        android:id="@+id/tvStats"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#F5F5F5"
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:textSize="9sp"
+        android:textColor="#7F8C8D"
+        android:gravity="center"
+        android:visibility="gone"/>
+
+    <!-- ── ProgressBar chargement ────────────────────────── -->
+    <ProgressBar
+        android:id="@+id/pbLoading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Historique — Sprint 5"
-        android:textSize="16sp"/>
+        android:layout_gravity="center"
+        android:indeterminate="true"
+        android:indeterminateTint="#C0392B"
+        android:layout_marginTop="120dp"
+        android:visibility="visible"/>
+
+    <!-- ── RecyclerView liste ─────────────────────────────── -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvHistory"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#F5F5F5"
+        android:padding="8dp"
+        android:clipToPadding="false"
+        android:scrollbars="none"
+        android:visibility="gone"/>
+
+    <!-- ── État vide global ───────────────────────────────── -->
+    <LinearLayout
+        android:id="@+id/llEmpty"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="20dp"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/history_empty_icon"
+            android:textSize="36sp"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/history_empty_title"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="#2C3E50"
+            android:layout_marginBottom="6dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/history_empty_msg"
+            android:textSize="9sp"
+            android:textColor="#7F8C8D"
+            android:gravity="center"
+            android:lineSpacingExtra="2dp"
+            android:maxWidth="200dp"/>
+
+    </LinearLayout>
+
+    <!-- ── État vide filtré ───────────────────────────────── -->
+    <LinearLayout
+        android:id="@+id/llEmptyFilter"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="20dp"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/history_empty_icon"
+            android:textSize="28sp"
+            android:textColor="#BDC3C7"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:id="@+id/tvEmptyFilterMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:textColor="#2C3E50"
+            android:layout_marginBottom="4dp"/>
+
+        <TextView
+            android:id="@+id/tvEmptyFilterSub"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="9sp"
+            android:textColor="#7F8C8D"
+            android:gravity="center"/>
+
+    </LinearLayout>
 
 </LinearLayout>

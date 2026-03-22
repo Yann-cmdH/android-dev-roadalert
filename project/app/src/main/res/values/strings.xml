@@ -130,11 +130,42 @@
     <string name="alert_contact_waiting">En attente...</string>
 
     <!-- ══ History ════════════════════════════════════════════ -->
-    <string name="history_title">Historique des alertes</string>
-    <string name="history_empty_title">Aucun incident</string>
-    <string name="history_empty_msg">Vous n\'avez eu aucun accident detecte. Restez prudent sur la route.</string>
 
     <!-- ══ Settings ═══════════════════════════════════════════ -->
     <string name="settings_title">Parametres</string>
+    <string name="history_title">Historique des alertes</string>
+    <string name="history_filter_all">Tous</string>
+    <string name="history_filter_accidents">Accidents</string>
+    <string name="history_filter_sos">SOS</string>
+    <string name="history_empty_icon">S</string>
+    <string name="history_empty_title">Aucun incident</string>
+    <string name="history_empty_msg">Vous n\'avez eu aucun accident detecte. Restez prudent sur la route.</string>
+    <!-- ══ History ════════════════════════════════════════════ -->
+
+
+    <string name="history_type_accident">Accident detecte</string>
+    <string name="history_type_sos">SOS Manuel</string>
+
+    <string name="history_group_today">AUJOURD\'HUI</string>
+    <string name="history_group_this_week">CETTE SEMAINE</string>
+    <string name="history_group_this_month">CE MOIS</string>
+    <string name="history_group_older">PLUS ANCIEN</string>
+
+    <string name="history_badge_sent">Envoye</string>
+    <string name="history_badge_partial">Partiel</string>
+    <string name="history_badge_failed">Echec</string>
+    <string name="history_badge_retry">Retry...</string>
+    <string name="history_badge_pending">En cours...</string>
+
+    <string name="history_gps_precise">GPS precis</string>
+    <string name="history_gps_approx">GPS approximatif</string>
+    <string name="history_gps_unavailable">GPS indisponible</string>
+
+    <string name="history_empty_filter_accidents_title">Aucun accident automatique</string>
+    <string name="history_empty_filter_sos_title">Aucun SOS manuel</string>
+    <string name="history_empty_filter_sub">Aucun evenement dans cette categorie.</string>
+
+    <string name="history_snackbar_tap">Detail des alertes disponible en Sprint 6</string>
+    <string name="history_note_annulations">Les annulations countdown ne sont pas enregistrees</string>
 
 </resources>

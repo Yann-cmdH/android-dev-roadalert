@@ -24,7 +24,7 @@ class ProfileSetupActivity : AppCompatActivity() {
         ProfileViewModelFactory(applicationContext)
     }
 
-    // ── Boutons groupe sanguin ────────────────────────────────
+    // ── Boutons groupe sanguin ────────────────────────────
     private val bloodTypeButtons by lazy {
         mapOf(
             "A+"  to binding.btnBloodAPos,
@@ -41,7 +41,9 @@ class ProfileSetupActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityProfileSetupBinding.inflate(layoutInflater)
+        binding = ActivityProfileSetupBinding.inflate(
+            layoutInflater
+        )
         setContentView(binding.root)
 
         setupBackNavigation()
@@ -51,9 +53,17 @@ class ProfileSetupActivity : AppCompatActivity() {
         setupClickListeners()
         observeViewModel()
         updateButtonState()
+
+        // ── Gestion ouverture depuis Settings ─────────────
+        // Si START_STEP = 2 → aller directement aux contacts
+        // Les données sont déjà chargées par init() du ViewModel
+        val startStep = intent.getIntExtra("START_STEP", 1)
+        if (startStep == 2) {
+            viewModel.goToStep2Direct()
+        }
     }
 
-    // ── Back navigation ───────────────────────────────────────
+    // ── Back navigation ───────────────────────────────────
 
     private fun setupBackNavigation() {
         onBackPressedDispatcher.addCallback(
@@ -71,12 +81,11 @@ class ProfileSetupActivity : AppCompatActivity() {
         )
     }
 
-    // ── Groupe sanguin — grille boutons ───────────────────────
+    // ── Groupe sanguin — grille boutons ───────────────────
 
     private fun setupBloodTypeButtons() {
         bloodTypeButtons.forEach { (type, button) ->
             button.setOnClickListener {
-                // Si déjà sélectionné → désélectionner
                 if (viewModel.isBloodTypeSelected(type)) {
                     viewModel.selectBloodType(null)
                 } else {
@@ -91,20 +100,24 @@ class ProfileSetupActivity : AppCompatActivity() {
         val selectedType = viewModel.selectedBloodType.value
         bloodTypeButtons.forEach { (type, button) ->
             if (type == selectedType) {
-                // Sélectionné → fond rouge
                 button.backgroundTintList =
-                    ColorStateList.valueOf(getColor(R.color.red_primary))
+                    ColorStateList.valueOf(
+                        getColor(R.color.red_primary)
+                    )
                 button.setTextColor(getColor(R.color.white))
             } else {
-                // Non sélectionné → fond gris
                 button.backgroundTintList =
-                    ColorStateList.valueOf(getColor(R.color.border))
-                button.setTextColor(getColor(R.color.text_primary))
+                    ColorStateList.valueOf(
+                        getColor(R.color.border)
+                    )
+                button.setTextColor(
+                    getColor(R.color.text_primary)
+                )
             }
         }
     }
 
-    // ── Contact 3 — bouton ajouter ────────────────────────────
+    // ── Contact 3 — bouton ajouter ────────────────────────
 
     private fun setupContact3Button() {
         binding.btnAddContact3.setOnClickListener {
@@ -114,10 +127,11 @@ class ProfileSetupActivity : AppCompatActivity() {
         }
     }
 
-    // ── Observe ViewModel ─────────────────────────────────────
+    // ── Observe ViewModel ─────────────────────────────────
 
     private fun observeViewModel() {
 
+        // Observer étape courante
         lifecycleScope.launch {
             viewModel.currentStep.collect { step ->
                 when (step) {
@@ -127,16 +141,19 @@ class ProfileSetupActivity : AppCompatActivity() {
             }
         }
 
+        // Observer données étape 1 — pré-remplissage
         lifecycleScope.launch {
             viewModel.step1Data.collect { data ->
                 data?.let {
                     if (viewModel.currentStep.value == 1) {
                         binding.etFullName.setText(it.fullName)
-                        binding.etPhoneNumber.setText(it.phoneNumber)
+                        binding.etPhoneNumber.setText(
+                            it.phoneNumber
+                        )
                         binding.etAllergies.setText(it.allergies)
-                        binding.etMedicalConditions
-                            .setText(it.medicalConditions)
-                        // Restaurer groupe sanguin
+                        binding.etMedicalConditions.setText(
+                            it.medicalConditions
+                        )
                         viewModel.selectBloodType(it.bloodType)
                         updateBloodTypeUI()
                     }
@@ -144,6 +161,53 @@ class ProfileSetupActivity : AppCompatActivity() {
             }
         }
 
+        // Observer contacts existants
+        // Pré-remplit les contacts seulement si on vient
+        // de Settings — évite d'écraser une saisie fraîche
+        lifecycleScope.launch {
+            viewModel.existingContacts.collect { contacts ->
+                val caller = intent.getStringExtra("CALLER")
+                if (caller == "SETTINGS" &&
+                    contacts.isNotEmpty()) {
+
+                    contacts.getOrNull(0)?.let { c ->
+                        binding.etContact1Name.setText(c.name)
+                        binding.etContact1Phone.setText(
+                            c.phoneNumber
+                        )
+                        binding.etContact1Relation.setText(
+                            c.relation
+                        )
+                    }
+
+                    contacts.getOrNull(1)?.let { c ->
+                        binding.etContact2Name.setText(c.name)
+                        binding.etContact2Phone.setText(
+                            c.phoneNumber
+                        )
+                        binding.etContact2Relation.setText(
+                            c.relation
+                        )
+                    }
+
+                    contacts.getOrNull(2)?.let { c ->
+                        binding.contact3Container.visibility =
+                            View.VISIBLE
+                        binding.btnAddContact3.visibility =
+                            View.GONE
+                        binding.etContact3Name.setText(c.name)
+                        binding.etContact3Phone.setText(
+                            c.phoneNumber
+                        )
+                        binding.etContact3Relation.setText(
+                            c.relation
+                        )
+                    }
+                }
+            }
+        }
+
+        // Observer succès sauvegarde
         lifecycleScope.launch {
             viewModel.saveSuccess.collect { success ->
                 if (success) {
@@ -159,6 +223,7 @@ class ProfileSetupActivity : AppCompatActivity() {
             }
         }
 
+        // Observer chargement
         lifecycleScope.launch {
             viewModel.isLoading.collect { loading ->
                 binding.btnAction.isEnabled = !loading
@@ -169,6 +234,7 @@ class ProfileSetupActivity : AppCompatActivity() {
             }
         }
 
+        // Observer erreurs
         lifecycleScope.launch {
             viewModel.errorMessage.collect { error ->
                 error?.let {
@@ -182,7 +248,7 @@ class ProfileSetupActivity : AppCompatActivity() {
         }
     }
 
-    // ── Steps display ─────────────────────────────────────────
+    // ── Steps display ─────────────────────────────────────
 
     private fun showStep1() {
         binding.step1Container.visibility = View.VISIBLE
@@ -197,7 +263,8 @@ class ProfileSetupActivity : AppCompatActivity() {
         binding.progressStep2.setBackgroundColor(
             getColor(R.color.border)
         )
-        binding.btnAction.text = getString(R.string.profile_btn_next)
+        binding.btnAction.text =
+            getString(R.string.profile_btn_next)
         clearStep1Errors()
         updateButtonState()
     }
@@ -215,12 +282,13 @@ class ProfileSetupActivity : AppCompatActivity() {
         binding.progressStep2.setBackgroundColor(
             getColor(R.color.red_primary)
         )
-        binding.btnAction.text = getString(R.string.profile_btn_save)
+        binding.btnAction.text =
+            getString(R.string.profile_btn_save)
         clearStep2Errors()
         updateButtonState()
     }
 
-    // ── Clear errors ──────────────────────────────────────────
+    // ── Clear errors ──────────────────────────────────────
 
     private fun clearStep1Errors() {
         binding.tvFullNameError.visibility = View.GONE
@@ -232,7 +300,7 @@ class ProfileSetupActivity : AppCompatActivity() {
         binding.tvContact1PhoneError.visibility = View.GONE
     }
 
-    // ── Text watchers ─────────────────────────────────────────
+    // ── Text watchers ─────────────────────────────────────
 
     private fun setupTextWatchers() {
         val watcher = object : TextWatcher {
@@ -258,7 +326,7 @@ class ProfileSetupActivity : AppCompatActivity() {
         binding.etContact3Phone.addTextChangedListener(watcher)
     }
 
-    // ── Click listeners ───────────────────────────────────────
+    // ── Click listeners ───────────────────────────────────
 
     private fun setupClickListeners() {
         binding.btnAction.setOnClickListener {
@@ -269,7 +337,7 @@ class ProfileSetupActivity : AppCompatActivity() {
         }
     }
 
-    // ── Step 1 handler ────────────────────────────────────────
+    // ── Step 1 handler ────────────────────────────────────
 
     private fun handleStep1Next() {
         val name = binding.etFullName.text.toString()
@@ -283,7 +351,8 @@ class ProfileSetupActivity : AppCompatActivity() {
             ).show()
 
             binding.tvFullNameError.visibility =
-                if (name.isBlank() || !viewModel.isValidName(name))
+                if (name.isBlank() ||
+                    !viewModel.isValidName(name))
                     View.VISIBLE else View.GONE
             binding.tvFullNameError.text =
                 if (name.isBlank())
@@ -314,7 +383,7 @@ class ProfileSetupActivity : AppCompatActivity() {
         )
     }
 
-    // ── Step 2 handler ────────────────────────────────────────
+    // ── Step 2 handler ────────────────────────────────────
 
     private fun handleStep2Save() {
         val c1Name = binding.etContact1Name.text.toString()
@@ -378,7 +447,7 @@ class ProfileSetupActivity : AppCompatActivity() {
         )
     }
 
-    // ── Button state ──────────────────────────────────────────
+    // ── Button state ──────────────────────────────────────
 
     private fun updateButtonState() {
         val isValid = when (viewModel.currentStep.value) {
@@ -416,10 +485,17 @@ class ProfileSetupActivity : AppCompatActivity() {
         }
     }
 
-    // ── Navigation ────────────────────────────────────────────
+    // ── Navigation ────────────────────────────────────────
 
     private fun navigateToHome() {
-        startActivity(Intent(this, HomeActivity::class.java))
-        finish()
+        val caller = intent.getStringExtra("CALLER")
+        if (caller == "SETTINGS") {
+            finish()
+        } else {
+            startActivity(
+                Intent(this, HomeActivity::class.java)
+            )
+            finish()
+        }
     }
 }

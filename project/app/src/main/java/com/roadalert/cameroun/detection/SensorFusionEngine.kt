@@ -1,58 +1,44 @@
 package com.roadalert.cameroun.detection
 
-import android.hardware.SensorEvent
-import android.hardware.SensorManager
 import com.roadalert.cameroun.util.Constants
+import kotlin.math.abs
 import kotlin.math.sqrt
 
 class SensorFusionEngine(
-    private val listener: AccidentListener
+    private val listener: AccidentListener,
+    private val impactThreshold: Float =
+        Constants.IMPACT_THRESHOLD,
+    private val noMovementTimeout: Long =
+        Constants.NO_MOVEMENT_TIMEOUT
 ) {
 
-    // ── État machine ──────────────────────────────────────────
+    // ── État machine ──────────────────────────────────────
     @Volatile
     private var state: DetectionState = DetectionState.IDLE
 
-    // ── Conditions ────────────────────────────────────────────
-    @Volatile
-    private var condition1Met: Boolean = false
-    @Volatile
-    private var condition2Met: Boolean = false
-    @Volatile
-    private var condition3Met: Boolean = false
+    // ── Conditions ────────────────────────────────────────
+    @Volatile private var condition1Met: Boolean = false
+    @Volatile private var condition2Met: Boolean = false
+    @Volatile private var condition3Met: Boolean = false
 
-    // ── Timestamps ────────────────────────────────────────────
-    // Moment où C1 a été détectée
-    @Volatile
-    private var condition1Timestamp: Long = 0L
+    // ── Timestamps ────────────────────────────────────────
+    @Volatile private var condition1Timestamp: Long = 0L
+    @Volatile private var immobilityStartTime: Long = 0L
 
-    // Moment où C3 a commencé (immobilité)
-    @Volatile
-    private var immobilityStartTime: Long = 0L
-
-    // ── Seuils — SAD section 6 ────────────────────────────────
-    // Seuil G-force impact — 24.5 m/s²
+    // ── Seuils calculés depuis paramètres ─────────────────
     // On compare magnitude² pour éviter sqrt coûteux
-    // 24.5² = 600.25
     private val impactThresholdSquared =
-        Constants.IMPACT_THRESHOLD * Constants.IMPACT_THRESHOLD
+        impactThreshold * impactThreshold
 
-    // Seuil gyroscope — téléphone horizontal
-    // rad/s — mouvement angulaire faible = horizontal
     private val gyroThreshold = 1.0f
-
-    // Seuil immobilité — Linear Acceleration
-    // m/s² — excluant gravité
     private val immobilityThreshold = 0.5f
-
-    // Fenêtre de temps pour confirmer C2 après C1 — 5 secondes
     private val conditionWindow = 5_000L
 
-    // ── Monitoring actif ──────────────────────────────────────
+    // ── Monitoring actif ──────────────────────────────────
     @Volatile
     private var isMonitoring: Boolean = false
 
-    // ── API publique ──────────────────────────────────────────
+    // ── API publique ──────────────────────────────────────
 
     fun startMonitoring() {
         reset()
@@ -65,7 +51,7 @@ class SensorFusionEngine(
         state = DetectionState.IDLE
     }
 
-    // ── Point d'entrée données capteurs ──────────────────────
+    // ── Point d'entrée données capteurs ───────────────────
 
     fun onSensorData(sensorType: Int, values: FloatArray) {
         if (!isMonitoring) return
@@ -84,14 +70,13 @@ class SensorFusionEngine(
         evaluate()
     }
 
-    // ── Traitement Accelerometer — Condition 1 ────────────────
+    // ── Condition 1 — Impact ──────────────────────────────
 
     private fun processAccelerometer(values: FloatArray) {
         val x = values[0]
         val y = values[1]
         val z = values[2]
 
-        // Magnitude² — évite calcul sqrt
         val magnitudeSquared = x * x + y * y + z * z
 
         if (magnitudeSquared > impactThresholdSquared) {
@@ -104,16 +89,14 @@ class SensorFusionEngine(
         }
     }
 
-    // ── Traitement Gyroscope — Condition 2 ───────────────────
+    // ── Condition 2 — Gyroscope horizontal ────────────────
 
     private fun processGyroscope(values: FloatArray) {
         if (!condition1Met) return
 
-        // Vérifier fenêtre de temps — C2 doit arriver
-        // dans les 5 secondes après C1
-        val elapsed = System.currentTimeMillis() - condition1Timestamp
+        val elapsed = System.currentTimeMillis() -
+                condition1Timestamp
         if (elapsed > conditionWindow) {
-            // C1 trop ancienne — réinitialiser
             reset()
             return
         }
@@ -121,9 +104,9 @@ class SensorFusionEngine(
         val rotX = values[0]
         val rotY = values[1]
 
-        // Téléphone horizontal si rotation faible sur X et Y
-        val isHorizontal = Math.abs(rotX) < gyroThreshold &&
-                Math.abs(rotY) < gyroThreshold
+        val isHorizontal =
+            abs(rotX) < gyroThreshold &&
+                    abs(rotY) < gyroThreshold
 
         if (isHorizontal && !condition2Met) {
             condition2Met = true
@@ -132,54 +115,50 @@ class SensorFusionEngine(
         }
     }
 
-    // ── Traitement Linear Acceleration — Condition 3 ─────────
+    // ── Condition 3 — Immobilité ──────────────────────────
 
-    private fun processLinearAcceleration(values: FloatArray) {
+    private fun processLinearAcceleration(
+        values: FloatArray
+    ) {
         if (!condition1Met || !condition2Met) return
 
         val x = values[0]
         val y = values[1]
         val z = values[2]
 
-        // Magnitude mouvement net sans gravité
         val magnitude = sqrt(x * x + y * y + z * z)
-
         val isImmobile = magnitude < immobilityThreshold
 
         if (isImmobile) {
             if (immobilityStartTime == 0L) {
-                // Début de la période d'immobilité
-                immobilityStartTime = System.currentTimeMillis()
+                immobilityStartTime =
+                    System.currentTimeMillis()
             } else {
-                // Vérifier durée d'immobilité
                 val immobilityDuration =
-                    System.currentTimeMillis() - immobilityStartTime
+                    System.currentTimeMillis() -
+                            immobilityStartTime
 
-                if (immobilityDuration >= Constants.NO_MOVEMENT_TIMEOUT) {
+                if (immobilityDuration >= noMovementTimeout) {
                     condition3Met = true
                     listener.onConditionProgress(3)
                 }
             }
         } else {
-            // Mouvement détecté — réinitialiser le timer C3
             immobilityStartTime = 0L
         }
     }
 
-    // ── Évaluation finale des 3 conditions ───────────────────
+    // ── Évaluation finale ─────────────────────────────────
 
     private fun evaluate() {
         if (condition1Met && condition2Met && condition3Met) {
             if (state != DetectionState.ACCIDENT_CONFIRMED) {
                 state = DetectionState.ACCIDENT_CONFIRMED
-                // Confiance basée sur les 3 conditions réunies
                 val confidence = calculateConfidence()
                 listener.onAccidentDetected(confidence)
             }
         }
     }
-
-    // ── Calcul confiance ──────────────────────────────────────
 
     private fun calculateConfidence(): Float {
         var confidence = 0f
@@ -189,15 +168,11 @@ class SensorFusionEngine(
         return confidence
     }
 
-    // ── Vérification état ─────────────────────────────────────
-
     fun isAccidentConfirmed(): Boolean {
         return state == DetectionState.ACCIDENT_CONFIRMED
     }
 
     fun getCurrentState(): DetectionState = state
-
-    // ── Reset complet ─────────────────────────────────────────
 
     fun reset() {
         condition1Met = false
@@ -210,8 +185,6 @@ class SensorFusionEngine(
         else
             DetectionState.IDLE
     }
-
-    // ── Cancel ────────────────────────────────────────────────
 
     fun cancel() {
         state = DetectionState.CANCELLED
