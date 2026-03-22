@@ -20,6 +20,8 @@ import com.roadalert.cameroun.data.db.entity.TriggerType
 import com.roadalert.cameroun.data.repository.AccidentRepository
 import com.roadalert.cameroun.data.repository.UserProfileRepository
 import com.roadalert.cameroun.ui.home.HomeActivity
+import com.roadalert.cameroun.util.AppSettings
+import com.roadalert.cameroun.util.Constants
 import com.roadalert.cameroun.util.ServiceActions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -41,12 +43,10 @@ class AccidentDetectionService : Service(),
     private lateinit var countdownManager: CountdownManager
     private lateinit var capabilityDetector: SensorCapabilityDetector
 
-    // ── AlertManager — Sprint 4 ───────────────────────────
+    // ── AlertManager ──────────────────────────────────────
     private lateinit var alertManager: AlertManager
 
     // ── Scope coroutines du Service ───────────────────────
-    // SupervisorJob → une coroutine échouée
-    // n'annule pas les autres
     private val serviceScope = CoroutineScope(
         Dispatchers.IO + SupervisorJob()
     )
@@ -78,10 +78,25 @@ class AccidentDetectionService : Service(),
         ) as SensorManager
 
         capabilityDetector = SensorCapabilityDetector(this)
-        fusionEngine = SensorFusionEngine(this)
-        countdownManager = CountdownManager()
 
-        // Initialiser AlertManager avec repositories
+        // ── Lire les paramètres utilisateur ───────────────
+        // AppSettings lit SharedPreferences
+        // Si l'utilisateur a modifié la sensibilité
+        // ou la durée du countdown dans Settings
+        // le service utilise ces valeurs
+        val appSettings = AppSettings(this)
+
+        fusionEngine = SensorFusionEngine(
+            listener = this,
+            impactThreshold = appSettings.getSensitivityThreshold(),
+            noMovementTimeout = Constants.NO_MOVEMENT_TIMEOUT
+        )
+
+        countdownManager = CountdownManager(
+            durationMs = appSettings.getCountdownDuration()
+        )
+
+        // ── Initialiser AlertManager avec repositories ────
         val database = AppDatabase.getInstance(this)
         val accidentRepository = AccidentRepository(
             database.accidentEventDAO()
@@ -259,12 +274,10 @@ class AccidentDetectionService : Service(),
     private fun onCountdownFinished(
         confidence: Float = 0f
     ) {
-        // Arrêter la détection pendant l'alerte
         fusionEngine.stopMonitoring()
         isMonitoring = false
         unregisterSensors()
 
-        // Déclencher AlertManager — TriggerType.AUTO
         alertManager.triggerAlert(
             triggerType = TriggerType.AUTO,
             gForceValue = confidence,
@@ -290,7 +303,6 @@ class AccidentDetectionService : Service(),
     }
 
     // ── Reprendre surveillance après alerte ───────────────
-    // Appelé par AlertManager quand l'alerte est terminée
 
     fun resumeMonitoring() {
         if (!isMonitoring) {
