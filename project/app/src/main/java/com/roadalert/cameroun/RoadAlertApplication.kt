@@ -5,6 +5,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import com.roadalert.cameroun.data.worker.ServiceWatchdogWorker
 
 class RoadAlertApplication : Application() {
 
@@ -13,6 +14,7 @@ class RoadAlertApplication : Application() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannels()
         }
+        ServiceWatchdogWorker.schedule(this)
     }
 
     private fun createNotificationChannels() {
@@ -72,5 +74,6 @@ class RoadAlertApplication : Application() {
         const val NOTIFICATION_ID_SERVICE = 1001
         const val NOTIFICATION_ID_COUNTDOWN = 1002
         const val NOTIFICATION_ID_ALERT = 1003
+        const val NOTIFICATION_ID_WATCHDOG = 1004
     }
 }

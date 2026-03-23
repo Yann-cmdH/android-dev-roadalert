@@ -58,6 +58,7 @@ class RetryWorker(
             database.accidentEventDAO()
         )
         val userProfileRepository = UserProfileRepository(
+            database,
             database.userDAO(),
             database.emergencyContactDAO()
         )

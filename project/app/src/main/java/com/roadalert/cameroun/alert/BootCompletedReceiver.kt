@@ -29,6 +29,7 @@ class BootCompletedReceiver : BroadcastReceiver() {
             try {
                 val db = AppDatabase.getInstance(context)
                 val repository = UserProfileRepository(
+                    db,
                     db.userDAO(),
                     db.emergencyContactDAO()
                 )

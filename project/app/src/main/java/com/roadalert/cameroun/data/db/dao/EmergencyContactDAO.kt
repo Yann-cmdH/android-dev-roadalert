@@ -54,4 +54,7 @@ interface EmergencyContactDAO {
                 "WHERE id = :contactId"
     )
     suspend fun deleteById(contactId: String)
+
+    @Query("DELETE FROM emergency_contact WHERE userId = :userId")
+    suspend fun deleteContactsByUser(userId: String)
 }

@@ -25,8 +25,12 @@ import com.roadalert.cameroun.util.Constants
 import com.roadalert.cameroun.util.ServiceActions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
 class AccidentDetectionService : Service(),
     SensorEventListener,
@@ -53,6 +57,9 @@ class AccidentDetectionService : Service(),
 
     // ── État interne ──────────────────────────────────────
     private var isMonitoring = false
+
+    // ── Heartbeat Watchdog ────────────────────────────────
+    private var heartbeatJob: Job? = null
 
     // ── Receiver annulation countdown ─────────────────────
     private val cancelReceiver = object : BroadcastReceiver() {
@@ -102,6 +109,7 @@ class AccidentDetectionService : Service(),
             database.accidentEventDAO()
         )
         val userProfileRepository = UserProfileRepository(
+            database,
             database.userDAO(),
             database.emergencyContactDAO()
         )
@@ -132,6 +140,7 @@ class AccidentDetectionService : Service(),
         fusionEngine.startMonitoring()
         isMonitoring = true
         broadcastServiceState(true)
+        startHeartbeat()
 
         return START_STICKY
     }
@@ -143,6 +152,7 @@ class AccidentDetectionService : Service(),
         isMonitoring = false
         broadcastServiceState(false)
         unregisterCancelReceiver()
+        heartbeatJob?.cancel()
         serviceScope.cancel()
         super.onDestroy()
     }
@@ -325,6 +335,17 @@ class AccidentDetectionService : Service(),
             setPackage(packageName)
         }
         sendBroadcast(intent)
+    }
+
+    // ── Heartbeat Watchdog ────────────────────────────────
+
+    private fun startHeartbeat() {
+        heartbeatJob = serviceScope.launch {
+            while (isActive) {
+                AppSettings(this@AccidentDetectionService).writeHeartbeat()
+                delay(30_000L)
+            }
+        }
     }
 
     // ── Register cancel receiver ──────────────────────────

@@ -91,4 +91,7 @@ class AccidentRepository(
     suspend fun getAccidentCount(userId: String): Int {
         return accidentEventDAO.getAccidentCount(userId)
     }
+
+    suspend fun hasPendingAlert(): Boolean =
+        accidentEventDAO.countPendingAlerts() > 0
 }

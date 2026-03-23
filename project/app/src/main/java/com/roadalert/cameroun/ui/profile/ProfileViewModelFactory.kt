@@ -16,6 +16,7 @@ class ProfileViewModelFactory(
             @Suppress("UNCHECKED_CAST")
             return ProfileViewModel(
                 UserProfileRepository(
+                    db,
                     db.userDAO(),
                     db.emergencyContactDAO()
                 )

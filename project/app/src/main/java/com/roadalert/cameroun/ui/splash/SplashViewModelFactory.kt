@@ -16,6 +16,7 @@ class SplashViewModelFactory(
             @Suppress("UNCHECKED_CAST")
             return SplashViewModel(
                 UserProfileRepository(
+                    db,
                     db.userDAO(),
                     db.emergencyContactDAO()
                 )
