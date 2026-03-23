@@ -1,6 +1,9 @@
 package com.roadalert.cameroun.ui.countdown
 
 import android.content.Intent
+import android.media.AudioAttributes
+import android.media.MediaPlayer
+import android.media.RingtoneManager
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -11,6 +14,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.roadalert.cameroun.databinding.ActivityCountdownBinding
 import com.roadalert.cameroun.ui.home.HomeActivity
+import com.roadalert.cameroun.util.AppSettings
 import com.roadalert.cameroun.util.Constants
 import com.roadalert.cameroun.util.ServiceActions
 
@@ -19,20 +23,30 @@ class CountdownActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCountdownBinding
     private var countDownTimer: CountDownTimer? = null
     private var vibrator: Vibrator? = null
+    private var countdownDuration: Long = Constants.COUNTDOWN_DURATION
+    private var mediaPlayer: MediaPlayer? = null
+    private var soundEnabled: Boolean = true
+    private var vibrationEnabled: Boolean = true
+    private var currentRemainingMs: Long = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityCountdownBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        countdownDuration = AppSettings(this).getCountdownDuration()
+        soundEnabled = AppSettings(this).isSoundEnabled()
+        vibrationEnabled = AppSettings(this).isVibrationEnabled()
         setupBackNavigation()
         setupVibrator()
         setupCancelButton()
         startCountdown()
+        startAlarmSound()
     }
 
     override fun onDestroy() {
         countDownTimer?.cancel()
+        stopAlarmSound()
         super.onDestroy()
     }
 
@@ -60,21 +74,32 @@ class CountdownActivity : AppCompatActivity() {
     }
 
     private fun vibrateShort() {
+        if (!vibrationEnabled) return
         vibrator?.let {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                it.vibrate(
-                    VibrationEffect.createOneShot(
-                        50L, VibrationEffect.DEFAULT_AMPLITUDE
+                if (currentRemainingMs > 5_000L) {
+                    it.vibrate(
+                        VibrationEffect.createOneShot(
+                            250L, VibrationEffect.DEFAULT_AMPLITUDE
+                        )
                     )
-                )
+                } else {
+                    it.vibrate(
+                        VibrationEffect.createWaveform(
+                            longArrayOf(0, 100, 100, 100, 100, 100),
+                            -1
+                        )
+                    )
+                }
             } else {
                 @Suppress("DEPRECATION")
-                it.vibrate(50L)
+                it.vibrate(250L)
             }
         }
     }
 
     private fun vibrateLong() {
+        if (!vibrationEnabled) return
         vibrator?.let {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 it.vibrate(
@@ -95,11 +120,41 @@ class CountdownActivity : AppCompatActivity() {
         }
     }
 
+    private fun startAlarmSound() {
+        if (!soundEnabled) return
+        try {
+            val alarmUri = RingtoneManager.getDefaultUri(
+                RingtoneManager.TYPE_ALARM
+            )
+            mediaPlayer = MediaPlayer().apply {
+                setAudioAttributes(
+                    AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_ALARM)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                        .build()
+                )
+                setDataSource(this@CountdownActivity, alarmUri)
+                isLooping = true
+                prepare()
+                start()
+            }
+        } catch (e: Exception) {
+            // Son alarm indisponible — ignorer silencieusement
+        }
+    }
+
+    private fun stopAlarmSound() {
+        mediaPlayer?.stop()
+        mediaPlayer?.release()
+        mediaPlayer = null
+    }
+
     private fun startCountdown() {
         countDownTimer = object : CountDownTimer(
-            Constants.COUNTDOWN_DURATION, 1_000L
+            countdownDuration, 1_000L
         ) {
             override fun onTick(millisUntilFinished: Long) {
+                currentRemainingMs = millisUntilFinished
                 val secondsLeft = (millisUntilFinished / 1000L) + 1
                 updateUI(secondsLeft)
                 vibrateShort()
@@ -114,13 +169,14 @@ class CountdownActivity : AppCompatActivity() {
     private fun updateUI(secondsLeft: Long) {
         binding.tvCountdownNumber.text = secondsLeft.toString()
         val progress = secondsLeft.toFloat() /
-                (Constants.COUNTDOWN_DURATION / 1000L).toFloat()
+                (countdownDuration / 1000L).toFloat()
         binding.countdownRing.progress = progress
     }
 
     private fun handleCancellation() {
         countDownTimer?.cancel()
-        sendBroadcast(Intent(ServiceActions.ACTION_CANCEL_COUNTDOWN))
+        stopAlarmSound()
+        sendBroadcast(Intent(ServiceActions.ACTION_CANCEL_COUNTDOWN).apply { setPackage(packageName) })
         vibrateLong()
         showCancelledState()
         binding.root.postDelayed({ navigateToHome() }, 500L)

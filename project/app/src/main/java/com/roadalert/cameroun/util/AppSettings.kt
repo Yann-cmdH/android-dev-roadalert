@@ -11,6 +11,7 @@ class AppSettings(context: Context) {
         const val KEY_COUNTDOWN = "countdown_seconds"
         const val KEY_SOUND = "sound_enabled"
         const val KEY_VIBRATION = "vibration_enabled"
+        const val KEY_HEARTBEAT = "last_heartbeat"
 
         const val SENSITIVITY_LOW = "LOW"
         const val SENSITIVITY_MEDIUM = "MEDIUM"
@@ -76,4 +77,26 @@ class AppSettings(context: Context) {
     fun reset() {
         prefs.edit().clear().apply()
     }
+
+    // ── Sync setters (commit) — Service Watchdog ──────────
+
+    fun setSensitivitySync(level: String) {
+        prefs.edit().putString(KEY_SENSITIVITY, level).commit()
+    }
+
+    fun setCountdownSync(seconds: Int) {
+        prefs.edit().putInt(KEY_COUNTDOWN, seconds).commit()
+    }
+
+    // ── Heartbeat — Service Watchdog ──────────────────────
+
+    fun writeHeartbeat() {
+        prefs.edit().putLong(KEY_HEARTBEAT, System.currentTimeMillis()).commit()
+    }
+
+    fun readHeartbeat(): Long =
+        prefs.getLong(KEY_HEARTBEAT, 0L)
+
+    fun isServiceAlive(timeoutMs: Long = 60_000L): Boolean =
+        System.currentTimeMillis() - readHeartbeat() < timeoutMs
 }

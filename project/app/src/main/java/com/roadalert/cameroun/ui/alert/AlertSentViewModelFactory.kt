@@ -23,6 +23,7 @@ class AlertSentViewModelFactory(
                 db.accidentEventDAO()
             )
             val userProfileRepository = UserProfileRepository(
+                db,
                 db.userDAO(),
                 db.emergencyContactDAO()
             )

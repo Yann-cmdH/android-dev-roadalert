@@ -105,4 +105,7 @@ interface AccidentEventDAO {
                 "WHERE userId = :userId"
     )
     suspend fun getAccidentCount(userId: String): Int
+
+    @Query("SELECT COUNT(*) FROM accident_event WHERE alertStatus IN ('PENDING', 'PENDING_RETRY')")
+    suspend fun countPendingAlerts(): Int
 }

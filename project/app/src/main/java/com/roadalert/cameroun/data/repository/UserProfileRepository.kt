@@ -1,5 +1,7 @@
 package com.roadalert.cameroun.data.repository
 
+import androidx.room.withTransaction
+import com.roadalert.cameroun.data.db.AppDatabase
 import com.roadalert.cameroun.data.db.dao.EmergencyContactDAO
 import com.roadalert.cameroun.data.db.dao.UserDAO
 import com.roadalert.cameroun.data.db.entity.EmergencyContact
@@ -7,6 +9,7 @@ import com.roadalert.cameroun.data.db.entity.User
 import kotlinx.coroutines.flow.Flow
 
 class UserProfileRepository(
+    private val database: AppDatabase,
     private val userDAO: UserDAO,
     private val emergencyContactDAO: EmergencyContactDAO
 ) {
@@ -47,9 +50,12 @@ class UserProfileRepository(
         user: User,
         contacts: List<EmergencyContact>
     ) {
-        userDAO.insertUser(user)
-        contacts.forEach { contact ->
-            emergencyContactDAO.insertContact(contact)
+        database.withTransaction {
+            emergencyContactDAO.deleteContactsByUser(user.id)
+            userDAO.insertUser(user)
+            contacts.forEach { contact ->
+                emergencyContactDAO.insertContact(contact)
+            }
         }
     }
 

@@ -69,9 +69,6 @@ dependencies {
     // ── Location — FusedLocationProvider (SAD AD-06) ──────
     implementation("com.google.android.gms:play-services-location:21.1.0")
 
-    // ── Security — EncryptedSharedPreferences (SAD sec 10) ─
-    implementation("androidx.security:security-crypto:1.1.0-alpha06")
-
     // ── Coroutines ────────────────────────────────────────
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
