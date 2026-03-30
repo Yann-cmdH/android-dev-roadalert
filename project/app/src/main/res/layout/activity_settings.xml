@@ -743,6 +743,78 @@
             </androidx.cardview.widget.CardView>
 
             <!-- ════════════════════════════════════════════════ -->
+            <!-- SECTION LANGUE                                   -->
+            <!-- ════════════════════════════════════════════════ -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_section_language"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textColor="#C0392B"
+                android:textAllCaps="true"
+                android:letterSpacing="0.05"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="4dp"/>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#FFFFFF"
+                android:layout_marginBottom="8dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:minHeight="56dp"
+                    android:gravity="center_vertical"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/settings_language_label"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            android:textColor="#2C3E50"/>
+
+                        <TextView
+                            android:id="@+id/tvCurrentLanguage"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="12sp"
+                            android:textColor="#95A5A6"/>
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/btnChangeLanguage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/settings_language_change"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="#C0392B"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackground"
+                        android:padding="8dp"/>
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- ════════════════════════════════════════════════ -->
             <!-- SECTION A PROPOS                                 -->
             <!-- ════════════════════════════════════════════════ -->
             <TextView

@@ -1,6 +1,7 @@
 package com.roadalert.cameroun.ui.onboarding
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -17,9 +18,14 @@ import androidx.lifecycle.lifecycleScope
 import com.roadalert.cameroun.R
 import com.roadalert.cameroun.databinding.ActivityOnboardingBinding
 import com.roadalert.cameroun.ui.profile.ProfileSetupActivity
+import com.roadalert.cameroun.util.LocaleHelper
 import kotlinx.coroutines.launch
 
 class OnboardingActivity : AppCompatActivity() {
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleHelper.applyLocale(newBase))
+    }
 
     private lateinit var binding: ActivityOnboardingBinding
     private val viewModel: OnboardingViewModel by viewModels()

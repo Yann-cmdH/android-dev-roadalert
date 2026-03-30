@@ -12,6 +12,7 @@ class AppSettings(context: Context) {
         const val KEY_SOUND = "sound_enabled"
         const val KEY_VIBRATION = "vibration_enabled"
         const val KEY_HEARTBEAT = "last_heartbeat"
+        const val KEY_LANGUAGE = "language"
 
         const val SENSITIVITY_LOW = "LOW"
         const val SENSITIVITY_MEDIUM = "MEDIUM"
@@ -73,6 +74,10 @@ class AppSettings(context: Context) {
     fun setVibrationEnabled(enabled: Boolean) {
         prefs.edit().putBoolean(KEY_VIBRATION, enabled).apply()
     }
+
+    fun getLanguage(): String = prefs.getString(KEY_LANGUAGE, "") ?: ""
+    fun setLanguage(lang: String) { prefs.edit().putString(KEY_LANGUAGE, lang).commit() }
+    fun isLanguageSet(): Boolean = getLanguage().isNotEmpty()
 
     fun reset() {
         prefs.edit().clear().apply()

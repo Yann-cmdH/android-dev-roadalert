@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- ══ Application ══════════════════════════════════════ -->
+    <string name="app_name">RoadAlert Cameroun</string>
+    <string name="splash_app_name">RoadAlert</string>
+    <string name="splash_subtitle">CAMEROUN</string>
+    <string name="splash_logo">RA</string>
+    <string name="splash_tagline">Votre protection sur la route</string>
+
+    <!-- ══ Onboarding ════════════════════════════════════════ -->
+    <string name="onboarding_permission_title">Autorisation requise</string>
+    <string name="onboarding_icon_gps">GPS</string>
+    <string name="onboarding_gps_name">Localisation GPS</string>
+    <string name="onboarding_gps_why">Envoie ta position exacte aux secours en cas d\'accident.</string>
+    <string name="onboarding_sms_name">Envoi de SMS</string>
+    <string name="onboarding_sms_why">Alerte tes proches meme sans internet. Fonctionne en zone 2G.</string>
+    <string name="onboarding_ready_title">Tout est pret</string>
+    <string name="onboarding_ready_msg">Toutes les autorisations sont accordees. Configurons maintenant votre profil medical.</string>
+    <string name="onboarding_required">Requis</string>
+    <string name="onboarding_note_required">Sans ceci l\'app ne peut pas fonctionner</string>
+    <string name="onboarding_btn_allow">Autoriser et continuer</string>
+    <string name="onboarding_btn_next">Configurer mon profil</string>
+    <string name="onboarding_permission_denied">Cette permission est necessaire pour le fonctionnement de l\'app</string>
+
+    <!-- ══ Home ═══════════════════════════════════════════════ -->
+    <string name="home_title">RoadAlert</string>
+    <string name="home_menu">Menu</string>
+    <string name="home_greeting_default">Bonjour</string>
+    <string name="home_sos">SOS</string>
+    <string name="home_sos_sub">Urgence</string>
+    <string name="home_sos_hint">Appuyer en cas d\'accident ou si vous etes temoin</string>
+    <string name="home_service_active">Protection active</string>
+    <string name="home_service_inactive">Protection inactive</string>
+    <string name="home_service_running">Detection en cours</string>
+    <string name="home_service_stopped">Service arrete</string>
+    <string name="home_gps_disabled_title">GPS desactive</string>
+    <string name="home_gps_disabled_sub">Position non incluse dans les alertes</string>
+    <string name="home_sms_disabled_title">SMS desactive</string>
+    <string name="home_sms_disabled_sub">App non fonctionnelle - alertes impossibles</string>
+    <string name="home_btn_activate">Activer</string>
+    <string name="home_debug_test">TEST - Simuler accident</string>
+    <string name="home_nav_home">Accueil</string>
+    <string name="home_nav_history">Historique</string>
+    <string name="home_nav_settings">Parametres</string>
+
+    <!-- ══ Dialog SOS ═════════════════════════════════════════ -->
+    <string name="dialog_sos_title">Envoyer une alerte ?</string>
+    <string name="dialog_sos_message">Vos contacts d\'urgence vont recevoir un SMS avec votre position GPS.</string>
+    <string name="dialog_confirm">Confirmer</string>
+    <string name="dialog_cancel">Annuler</string>
+
+    <!-- ══ Notification ═══════════════════════════════════════ -->
+    <string name="notification_service_title">RoadAlert - Protection active</string>
+    <string name="notification_service_text">Detection d\'accidents en cours</string>
+
+    <!-- ══ Countdown ══════════════════════════════════════════ -->
+    <string name="countdown_title">Envoi de l\'alerte dans</string>
+    <string name="countdown_seconds">secondes</string>
+    <string name="countdown_subtitle">Appuyez sur Annuler\nsi vous allez bien</string>
+    <string name="countdown_btn_cancel">Annuler l\'alerte</string>
+    <string name="countdown_cancelled_title">Alerte annulee</string>
+    <string name="countdown_cancelled_sub">Vous allez bien.\nLa detection reprend automatiquement.</string>
+    <string name="countdown_expired_title">Alerte envoyee</string>
+    <string name="countdown_expired_sub">Vos contacts d\'urgence ont ete alertes.</string>
+
+    <!-- ══ Profile Setup ══════════════════════════════════════ -->
+    <string name="profile_title">Mon profil</string>
+    <string name="profile_step_1">1 / 2</string>
+    <string name="profile_step_2">2 / 2</string>
+    <string name="profile_step_1_label">Etape 1 sur 2 - Profil personnel</string>
+    <string name="profile_step_2_label">Etape 2 sur 2 - Contacts d\'urgence</string>
+    <string name="profile_section_personal">Informations personnelles</string>
+    <string name="profile_section_medical">Informations medicales</string>
+    <string name="profile_medical_note">Ces informations aident les secours a vous prendre en charge. Toutes optionnelles.</string>
+    <string name="profile_contacts_note">En cas d\'accident, ces personnes recoivent un SMS avec votre position GPS exacte.</string>
+    <string name="profile_full_name_label">NOM COMPLET</string>
+    <string name="profile_full_name_hint">Entrez votre nom complet...</string>
+    <string name="profile_phone_label">TELEPHONE</string>
+    <string name="profile_phone_hint">9 chiffres commencant par 6 - ex: 677654321</string>
+    <string name="profile_blood_type_label">GROUPE SANGUIN</string>
+    <string name="profile_blood_type_hint">Ex: A+, O-, B+...</string>
+    <string name="profile_blood_nsp">Je ne connais pas mon groupe sanguin</string>
+    <string name="profile_allergies_label">ALLERGIES CONNUES</string>
+    <string name="profile_allergies_hint">Ex: Penicilline, aspirine...</string>
+    <string name="profile_conditions_label">CONDITIONS MEDICALES</string>
+    <string name="profile_conditions_hint">Ex: Diabete, hypertension...</string>
+    <string name="profile_contact_1_title">Contact principal - Obligatoire</string>
+    <string name="profile_contact_2_title">Contact secondaire - Optionnel</string>
+    <string name="profile_contact_3_title">3eme contact - Optionnel</string>
+    <string name="profile_add_contact_3">+ Ajouter un 3eme contact</string>
+    <string name="profile_contact_name_label">NOM COMPLET</string>
+    <string name="profile_contact_name_hint">Nom du contact...</string>
+    <string name="profile_contact_phone_label">TELEPHONE</string>
+    <string name="profile_contact_phone_hint">9 chiffres commencant par 6 - ex: 677654321</string>
+    <string name="profile_contact_phone_required">Telephone requis si nom rempli</string>
+    <string name="profile_contact_relation_label">RELATION</string>
+    <string name="profile_contact_relation_hint">Ex: Mere, Pere, Ami...</string>
+    <string name="profile_contact_partial_error">Contact 2 incomplet - remplissez nom et telephone ou laissez les deux vides</string>
+    <string name="profile_btn_next">Suivant</string>
+    <string name="profile_btn_save">Enregistrer et continuer</string>
+    <string name="profile_saving">Enregistrement...</string>
+    <string name="profile_saved">Profil enregistre avec succes</string>
+    <string name="profile_field_required">Champ obligatoire</string>
+    <string name="profile_missing_fields">Remplissez les champs obligatoires</string>
+    <string name="profile_name_invalid">Le nom ne peut pas contenir de chiffres</string>
+    <string name="profile_phone_invalid">Numero invalide - 9 chiffres commencant par 6</string>
+
+    <!-- ══ AlertSentActivity ══════════════════════════════════ -->
+    <string name="alert_sending_title">Envoi de l\'alerte...</string>
+    <string name="alert_sending_desc">Capture GPS + envoi SMS en cours. Veuillez patienter.</string>
+    <string name="alert_sent_title">Alerte envoyee !</string>
+    <string name="alert_partial_title">Alerte partiellement envoyee</string>
+    <string name="alert_partial_desc">Un SMS n\'a pas pu etre envoye. Nouvel essai en cours automatiquement.</string>
+    <string name="alert_failed_title">Alerte non envoyee</string>
+    <string name="alert_failed_desc">Impossible d\'envoyer apres 3 tentatives. Appelez les secours directement.</string>
+    <string name="alert_btn_samu">Appeler le 15 - SAMU</string>
+    <string name="alert_btn_police">Appeler le 117 - Urgences</string>
+    <string name="alert_btn_home">Retour a l\'accueil</string>
+    <string name="alert_btn_home_return">Retour - Service reprend</string>
+    <string name="alert_btn_home_failed">Retour a l\'accueil</string>
+    <string name="alert_notice_sending">Ne fermez pas l\'application</string>
+    <string name="alert_notice_failed">Ecran reste visible - pas d\'auto-fermeture</string>
+    <string name="alert_gps_sent">POSITION ENVOYEE</string>
+    <string name="alert_gps_approx">POSITION APPROXIMATIVE</string>
+    <string name="alert_gps_unavailable">POSITION NON DISPONIBLE</string>
+    <string name="alert_contact_sent">SMS envoye</string>
+    <string name="alert_contact_failed">Echec</string>
+    <string name="alert_contact_pending">En cours...</string>
+    <string name="alert_contact_waiting">En attente...</string>
+
+    <!-- ══ History ════════════════════════════════════════════ -->
+
+    <!-- ══ Settings ═══════════════════════════════════════════ -->
+    <string name="settings_title">Parametres</string>
+    <string name="history_title">Historique des alertes</string>
+    <string name="history_filter_all">Tous</string>
+    <string name="history_filter_accidents">Accidents</string>
+    <string name="history_filter_sos">SOS</string>
+    <string name="history_empty_icon">S</string>
+    <string name="history_empty_title">Aucun incident</string>
+    <string name="history_empty_msg">Vous n\'avez eu aucun accident detecte. Restez prudent sur la route.</string>
+    <!-- ══ History ════════════════════════════════════════════ -->
+
+
+    <string name="history_type_accident">Accident detecte</string>
+    <string name="history_type_sos">SOS Manuel</string>
+
+    <string name="history_group_today">AUJOURD\'HUI</string>
+    <string name="history_group_this_week">CETTE SEMAINE</string>
+    <string name="history_group_this_month">CE MOIS</string>
+    <string name="history_group_older">PLUS ANCIEN</string>
+
+    <string name="history_badge_sent">Envoye</string>
+    <string name="history_badge_partial">Partiel</string>
+    <string name="history_badge_failed">Echec</string>
+    <string name="history_badge_retry">Retry...</string>
+    <string name="history_badge_pending">En cours...</string>
+
+    <string name="history_gps_precise">GPS precis</string>
+    <string name="history_gps_approx">GPS approximatif</string>
+    <string name="history_gps_unavailable">GPS indisponible</string>
+
+    <string name="history_empty_filter_accidents_title">Aucun accident automatique</string>
+    <string name="history_empty_filter_sos_title">Aucun SOS manuel</string>
+    <string name="history_empty_filter_sub">Aucun evenement dans cette categorie.</string>
+
+    <string name="history_snackbar_tap">Detail des alertes disponible en Sprint 6</string>
+    <string name="history_note_annulations">Les annulations countdown ne sont pas enregistrees</string>
+
+    <!-- ══ Settings ════════════════════════════════════════════ -->
+    <string name="settings_header_modify">Modifier ›</string>
+    <string name="settings_header_configure">Configurer ›</string>
+    <string name="settings_header_no_profile">Profil non configure</string>
+    <string name="settings_service_active">Protection active — detection en cours</string>
+    <string name="settings_service_inactive">Service arrete — verifiez les permissions</string>
+    <string name="settings_service_profile_required">Profil requis pour activer la protection</string>
+    <string name="settings_section_contacts">Contacts d\'urgence</string>
+    <string name="settings_contacts_empty">Aucun contact — les alertes ne peuvent pas etre envoyees</string>
+    <string name="settings_contacts_add">Ajouter</string>
+    <string name="settings_contacts_add_first">+ Ajouter un contact d\'urgence</string>
+    <string name="settings_contacts_modify">Modifier les contacts</string>
+    <string name="settings_contacts_none">Aucun contact configure</string>
+    <string name="settings_section_medical">Mon profil medical</string>
+    <string name="settings_medical_blood">Groupe sanguin</string>
+    <string name="settings_medical_allergies">Allergies</string>
+    <string name="settings_medical_conditions">Conditions medicales</string>
+    <string name="settings_medical_empty">\u2014</string>
+    <string name="settings_section_detection">Detection</string>
+    <string name="settings_sensitivity_label">Sensibilite de detection</string>
+    <string name="settings_sensitivity_prudent">Prudent</string>
+    <string name="settings_sensitivity_standard">Standard</string>
+    <string name="settings_sensitivity_sportif">Sportif</string>
+    <string name="settings_sensitivity_note_prudent">Moins d\'alertes accidentelles. Ideal conduite douce.</string>
+    <string name="settings_sensitivity_note_standard">Recommande pour la route au Cameroun</string>
+    <string name="settings_sensitivity_note_sportif">Ideal moto ou route accidentee. Plus d\'alertes possible.</string>
+    <string name="settings_countdown_label">Duree du compte a rebours</string>
+    <string name="settings_countdown_10">10 sec</string>
+    <string name="settings_countdown_15">15 sec</string>
+    <string name="settings_countdown_20">20 sec</string>
+    <string name="settings_countdown_note_10">Reaction rapide — moins de temps pour annuler</string>
+    <string name="settings_countdown_note_15">Defaut recommande — temps pour annuler</string>
+    <string name="settings_countdown_note_20">Plus de temps pour annuler une fausse alerte</string>
+    <string name="settings_section_notifications">Notifications</string>
+    <string name="settings_sound_label">Son d\'alerte</string>
+    <string name="settings_sound_sub">Son lors de la detection</string>
+    <string name="settings_vibration_label">Vibration</string>
+    <string name="settings_vibration_sub">Vibration pendant le countdown</string>
+    <string name="settings_section_about">A propos</string>
+    <string name="settings_about_version">Version de l\'app</string>
+    <string name="settings_about_devs">Developpeurs</string>
+    <string name="settings_about_devs_value">Yann + Collegue</string>
+    <string name="settings_about_context">Contexte</string>
+    <string name="settings_about_context_value">Projet academique 2025-2026</string>
+    <string name="settings_about_zone">Zone couverte</string>
+    <string name="settings_about_zone_value">Yaounde + Douala</string>
+    <string name="settings_easter_egg">Mode developpeur active</string>
+    <string name="settings_section_danger">Zone danger</string>
+    <string name="settings_danger_warning">Reinitialiser supprime toutes vos donnees de facon definitive.</string>
+    <string name="settings_reset_button">Reinitialiser l\'application</string>
+    <string name="settings_reset_dialog_title">Reinitialiser ?</string>
+    <string name="settings_reset_dialog_message">Toutes vos donnees seront supprimees :\n\n\u2022 Votre profil medical\n\u2022 Vos contacts d\'urgence\n\u2022 Votre historique complet\n\nCette action est IRREVERSIBLE.</string>
+    <string name="settings_reset_dialog_cancel">Annuler</string>
+    <string name="settings_reset_dialog_confirm">Reinitialiser</string>
+    <string name="settings_reset_dialog_wait">Veuillez attendre avant de confirmer\u2026</string>
+    <string name="settings_reset_dialog_ready">Pret — confirmez si vous etes sur</string>
+    <string name="settings_reset_blocked">Alerte en cours. Attendez la fin avant de reinitialiser.</string>
+    <string name="settings_service_restarted">Parametres appliques. Service redemarre.</string>
+    <string name="settings_service_restart_failed">Parametres sauvegardes. Verifiez que la protection est active.</string>
+    <string name="settings_saved">Parametre sauvegarde</string>
+
+    <!-- ══ Language selection ═════════════════════════════════ -->
+    <string name="language_title">RoadAlert</string>
+    <string name="language_subtitle_en">Choose your language</string>
+    <string name="language_subtitle_fr">Choisissez votre langue</string>
+    <string name="language_btn_english">English</string>
+    <string name="language_btn_french">Fran\u00e7ais</string>
+    <string name="language_note_en">You can change this later in Settings</string>
+    <string name="language_note_fr">Vous pourrez changer dans les Param\u00e8tres</string>
+    <string name="settings_language_label">Langue</string>
+    <string name="settings_language_change">Changer de langue</string>
+    <string name="settings_section_language">Langue</string>
+
+</resources>

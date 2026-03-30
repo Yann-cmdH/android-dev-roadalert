@@ -1,5 +1,6 @@
 package com.roadalert.cameroun.ui.profile
 
+import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
@@ -14,9 +15,14 @@ import com.google.android.material.snackbar.Snackbar
 import com.roadalert.cameroun.R
 import com.roadalert.cameroun.databinding.ActivityProfileSetupBinding
 import com.roadalert.cameroun.ui.home.HomeActivity
+import com.roadalert.cameroun.util.LocaleHelper
 import kotlinx.coroutines.launch
 
 class ProfileSetupActivity : AppCompatActivity() {
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleHelper.applyLocale(newBase))
+    }
 
     private lateinit var binding: ActivityProfileSetupBinding
 

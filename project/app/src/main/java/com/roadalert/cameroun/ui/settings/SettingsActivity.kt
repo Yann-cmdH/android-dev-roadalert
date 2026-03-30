@@ -4,6 +4,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import com.roadalert.cameroun.ui.language.LanguageSelectionActivity
+import com.roadalert.cameroun.util.LocaleHelper
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Build
@@ -50,6 +52,10 @@ class SettingsActivity : AppCompatActivity() {
     private var resetDialog: AlertDialog? = null
     private var easterEggCount: Int = 0
 
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleHelper.applyLocale(newBase))
+    }
+
     // ── Lifecycle ─────────────────────────────────────────────
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,10 +65,12 @@ class SettingsActivity : AppCompatActivity() {
 
         setupClickListeners()
         observeViewModel()
+        updateLanguage()
     }
 
     override fun onResume() {
         super.onResume()
+        updateLanguage()
         val filter = IntentFilter(ServiceActions.ACTION_SERVICE_STATE_CHANGED)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             registerReceiver(serviceStateReceiver, filter, RECEIVER_NOT_EXPORTED)
@@ -354,6 +362,17 @@ class SettingsActivity : AppCompatActivity() {
         binding.switchVibration.isChecked = state.vibrationEnabled
         binding.switchVibration.setOnCheckedChangeListener { _, isChecked ->
             viewModel.setVibrationEnabled(isChecked)
+        }
+    }
+
+    // ── Language ──────────────────────────────────────────────
+
+    private fun updateLanguage() {
+        binding.tvCurrentLanguage.text =
+            if (AppSettings(this).getLanguage() == "fr") "Français" else "English"
+        binding.btnChangeLanguage.setOnClickListener {
+            startActivity(Intent(this, LanguageSelectionActivity::class.java))
+            finish()
         }
     }
 

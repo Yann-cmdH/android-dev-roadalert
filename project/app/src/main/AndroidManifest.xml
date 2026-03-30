@@ -108,6 +108,11 @@
             android:name=".ui.settings.SettingsActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".ui.language.LanguageSelectionActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+
         <!-- ── ForegroundService (SAD AD-04) ──────────────── -->
         <!--
             foregroundServiceType="location"
