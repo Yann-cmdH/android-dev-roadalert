@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="40dp"
+    android:background="#FFFFFF">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/language_title"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:textColor="#C0392B"
+        android:gravity="center"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/language_subtitle_en"
+        android:textSize="15sp"
+        android:textColor="#7F8C8D"
+        android:gravity="center"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/language_subtitle_fr"
+        android:textSize="15sp"
+        android:textColor="#7F8C8D"
+        android:gravity="center"
+        android:layout_marginBottom="40dp"/>
+
+    <TextView
+        android:id="@+id/btnEnglish"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/language_btn_english"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#C0392B"
+        android:gravity="center"
+        android:padding="16dp"
+        android:background="@drawable/shape_btn_language_outline"
+        android:layout_marginBottom="12dp"
+        android:clickable="true"
+        android:focusable="true"/>
+
+    <TextView
+        android:id="@+id/btnFrancais"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/language_btn_french"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:gravity="center"
+        android:padding="16dp"
+        android:background="@drawable/shape_btn_language_filled"
+        android:clickable="true"
+        android:focusable="true"/>
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="32dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/language_note_en"
+        android:textSize="12sp"
+        android:textColor="#BDC3C7"
+        android:gravity="center"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/language_note_fr"
+        android:textSize="12sp"
+        android:textColor="#BDC3C7"
+        android:gravity="center"/>
+
+</LinearLayout>

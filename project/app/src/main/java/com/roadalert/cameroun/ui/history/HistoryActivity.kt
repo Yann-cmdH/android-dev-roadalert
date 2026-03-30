@@ -1,5 +1,6 @@
 package com.roadalert.cameroun.ui.history
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -13,9 +14,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.roadalert.cameroun.R
 import com.roadalert.cameroun.databinding.ActivityHistoryBinding
+import com.roadalert.cameroun.util.LocaleHelper
 import kotlinx.coroutines.launch
 
 class HistoryActivity : AppCompatActivity() {
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleHelper.applyLocale(newBase))
+    }
 
     private lateinit var binding: ActivityHistoryBinding
 

@@ -1,5 +1,6 @@
 package com.roadalert.cameroun.ui.countdown
 
+import android.content.Context
 import android.content.Intent
 import android.media.AudioAttributes
 import android.media.MediaPlayer
@@ -16,9 +17,14 @@ import com.roadalert.cameroun.databinding.ActivityCountdownBinding
 import com.roadalert.cameroun.ui.home.HomeActivity
 import com.roadalert.cameroun.util.AppSettings
 import com.roadalert.cameroun.util.Constants
+import com.roadalert.cameroun.util.LocaleHelper
 import com.roadalert.cameroun.util.ServiceActions
 
 class CountdownActivity : AppCompatActivity() {
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleHelper.applyLocale(newBase))
+    }
 
     private lateinit var binding: ActivityCountdownBinding
     private var countDownTimer: CountDownTimer? = null

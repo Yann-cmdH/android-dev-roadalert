@@ -6,8 +6,13 @@ import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import com.roadalert.cameroun.data.worker.ServiceWatchdogWorker
+import com.roadalert.cameroun.util.LocaleHelper
 
 class RoadAlertApplication : Application() {
+
+    override fun attachBaseContext(base: Context) {
+        super.attachBaseContext(LocaleHelper.applyLocale(base))
+    }
 
     override fun onCreate() {
         super.onCreate()

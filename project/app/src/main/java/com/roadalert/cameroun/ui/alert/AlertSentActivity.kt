@@ -1,6 +1,7 @@
 package com.roadalert.cameroun.ui.alert
 
 import android.animation.ObjectAnimator
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -14,6 +15,7 @@ import com.roadalert.cameroun.R
 import com.roadalert.cameroun.data.db.entity.SmsStatus
 import com.roadalert.cameroun.databinding.ActivityAlertSentBinding
 import com.roadalert.cameroun.ui.home.HomeActivity
+import com.roadalert.cameroun.util.LocaleHelper
 import com.roadalert.cameroun.util.ServiceActions
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -21,6 +23,10 @@ import java.util.Date
 import java.util.Locale
 
 class AlertSentActivity : AppCompatActivity() {
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleHelper.applyLocale(newBase))
+    }
 
     private lateinit var binding: ActivityAlertSentBinding
 

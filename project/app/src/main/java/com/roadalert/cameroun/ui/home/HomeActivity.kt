@@ -24,10 +24,15 @@ import com.roadalert.cameroun.detection.AccidentDetectionService
 import com.roadalert.cameroun.ui.countdown.CountdownActivity
 import com.roadalert.cameroun.ui.history.HistoryActivity
 import com.roadalert.cameroun.ui.settings.SettingsActivity
+import com.roadalert.cameroun.util.LocaleHelper
 import com.roadalert.cameroun.util.ServiceActions
 import kotlinx.coroutines.launch
 
 class HomeActivity : AppCompatActivity() {
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleHelper.applyLocale(newBase))
+    }
 
     private lateinit var binding: ActivityHomeBinding
 
